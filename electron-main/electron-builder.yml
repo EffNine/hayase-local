@@ -1,16 +1,6 @@
 appId: com.github.afnanrudy.hayase-lite
 productName: Hayase-lite
-electronFuses:
-  resetAdHocDarwinSignature: false
-  runAsNode: false
-  enableCookieEncryption: true
-  enableNodeOptionsEnvironmentVariable: false
-  enableNodeCliInspectArguments: false
-  enableEmbeddedAsarIntegrityValidation: true
-  onlyLoadAppFromAsar: true
-  disallowCodeGenerationFromStrings: true
-  disableProtoThrow: true
-  frozenIntrinsics: true
+electronVersion: 42.2.0
 directories:
   buildResources: build
 asarUnpack:
@@ -110,7 +100,6 @@ publish:
   provider: github
   owner: afnanrudy
   repo: hayase-lite
-electronDist: electron-dist
 protocols:
   - name: hayase-lite
     schemes:
