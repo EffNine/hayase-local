@@ -1,0 +1,9 @@
+import { writable } from 'simple-store-svelte'
+
+import type { Media } from './modules/anilist'
+
+export const COMMITS_URL = 'https://api.github.com/repos/afnanrudy/hayase-lite/commits'
+export const WEB_URL = 'https://github.com/afnanrudy/hayase-lite'
+export const SETUP_VERSION = 3
+
+export const searchStore = writable<{episode: number, media: Media} | undefined>(undefined)

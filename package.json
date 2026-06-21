@@ -1,0 +1,18 @@
+{
+  "name": "hayase-lite",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hayase-lite - Personal torrent streaming app",
+  "packageManager": "pnpm@10.28.1",
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter ui dev\" \"pnpm --filter electron dev\"",
+    "dev:ui": "pnpm --filter ui dev",
+    "build": "pnpm --filter ui build && pnpm --filter electron build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm --filter native build && pnpm --filter torrent-client build && pnpm --filter electron typecheck",
+    "clean": "pnpm -r exec rm -rf dist out .output .svelte-kit build node_modules"
+  },
+  "devDependencies": {
+    "electron": "42.2.0"
+  }
+}

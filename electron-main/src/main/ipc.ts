@@ -1,0 +1,229 @@
+import { spawn } from 'node:child_process'
+import { readFile } from 'node:fs/promises'
+import os from 'node:os'
+import { basename, dirname, extname } from 'node:path'
+
+import { app, dialog, shell, type UtilityProcess, ipcMain, systemPreferences } from 'electron'
+import log from 'electron-log/main'
+import { autoUpdater } from 'electron-updater'
+
+import store from './store'
+
+import type App from './app'
+import type { ClientSettings } from 'native'
+
+const WHITELISTED_URLS = ['https://anilist.co/', 'https://myanimelist.net/', 'https://thewiki.moe', 'https://kitsu.app']
+
+let player: ReturnType<typeof spawn> | undefined
+
+export default class IPC {
+  app
+  torrentProcess
+  hideToTray = false
+  corsURLS: string[] = []
+  constructor (window: App, torrentProcess: UtilityProcess) {
+    this.app = window
+    this.torrentProcess = torrentProcess
+    ipcMain.handle('version', () => app.getVersion())
+  }
+
+  openURL (url: string) {
+    if (!WHITELISTED_URLS.some((whitelisted) => url.startsWith(whitelisted))) return
+    shell.openExternal(url)
+  }
+
+  minimise () {
+    this.app.mainWindow.minimize()
+  }
+
+  maximise () {
+    this.app.mainWindow.isMaximized() ? this.app.mainWindow.unmaximize() : this.app.mainWindow.maximize()
+  }
+
+  close () {
+    if (this.hideToTray) {
+      this.app.mainWindow.hide()
+    } else {
+      this.app.destroy()
+    }
+  }
+
+  setHideToTray (enabled: boolean) {
+    this.hideToTray = enabled
+  }
+
+  restart () {
+    app.relaunch()
+    this.app.destroy()
+  }
+
+  enableCORS (urls: string[]) {
+    this.corsURLS = urls.filter(url => !WHITELISTED_URLS.some(whitelisted => url.startsWith(whitelisted)))
+  }
+
+  downloadProgress (percent: number) {
+    this.app.mainWindow.setProgressBar((percent === 1 || percent === 0) ? -1 : percent)
+  }
+
+  focus () {
+    this.app.mainWindow.show()
+    if (this.app.mainWindow.isMinimized()) this.app.mainWindow.restore()
+    this.app.mainWindow.focus()
+  }
+
+  setZoom (scale: number) {
+    this.app.mainWindow.webContents.setZoomFactor(Math.min(2.5, Math.max(Number(scale) || 1, 0.3)))
+  }
+
+  unsafeUseInternalALAPI () {
+    app.relaunch({ args: ['--use-internal-al-api'] })
+    this.app.destroy()
+  }
+
+  navigate () {
+    this.app.protocol.navigateTarget()
+  }
+
+  async selectPlayer () {
+    const { filePaths, canceled } = await dialog.showOpenDialog({
+      title: 'Select video player executable',
+      properties: ['openFile']
+    })
+    if (canceled || !filePaths.length) return store.get('player')
+
+    const path = filePaths[0]!
+
+    store.set('player', path)
+    return basename(path, extname(path))
+  }
+
+  updateSettings (settings: ClientSettings = store.data.torrentSettings) {
+    store.set('torrentSettings', settings)
+
+    this.torrentProcess.postMessage({ id: 'settings', data: { ...store.data.torrentSettings, path: store.data.torrentPath } })
+  }
+
+  async selectDownload () {
+    const { filePaths, canceled } = await dialog.showOpenDialog({
+      title: 'Select torrent download location',
+      properties: ['openDirectory']
+    })
+    if (canceled || !filePaths.length) return store.get('torrentPath')
+
+    let path = filePaths[0]!
+
+    if (dirname(path) === path) throw new Error('Cannot select root directory as download location. Please create a folder inside the desired drive and select that instead.')
+
+    if (!(path.endsWith('\\') || path.endsWith('/'))) {
+      if (path.includes('\\')) {
+        path += '\\'
+      } else if (path.includes('/')) {
+        path += '/'
+      }
+    }
+    store.set('torrentPath', path)
+    this.updateSettings()
+    return path
+  }
+
+  setAngle (angle: string) {
+    const current = store.get('angle')
+    if (current === angle) return
+    store.set('angle', angle)
+    this.restart()
+  }
+
+  async getLogs () {
+    return await readFile(log.transports.file.getFile().path, 'utf8')
+  }
+
+  async getDeviceInfo () {
+    const { model, speed } = os.cpus()[0]!
+    return {
+      features: app.getGPUFeatureStatus(),
+      info: await app.getGPUInfo('complete'),
+      cpu: { model, speed },
+      ram: os.totalmem()
+    }
+  }
+
+  openUIDevtools () {
+    this.app.mainWindow.webContents.openDevTools({ mode: 'detach' })
+  }
+
+  toggleDiscordDetails (_enabled: boolean) {
+    // Discord RPC removed in Hayase-lite
+  }
+
+  setMediaSession (_metadata: any, _id: number) {
+    // Discord RPC removed in Hayase-lite
+  }
+
+  setPositionState (_state?: any) {
+    // Discord RPC removed in Hayase-lite
+  }
+
+  setPlayBackState (_paused: 'none' | 'paused' | 'playing') {
+    // Discord RPC removed in Hayase-lite
+  }
+
+  setDOH (dns: string) {
+    this.app.setDOH(dns)
+    store.set('doh', dns)
+    // this.updateSettings()
+  }
+
+  version () {
+    app.getVersion()
+  }
+
+  updateProgress () {
+    autoUpdater.on('download-progress', (progress) => {
+      this.app.mainWindow.webContents.send('update-progress', progress.percent)
+    })
+    autoUpdater.on('update-downloaded', () => {
+      this.app.mainWindow.webContents.send('update-progress', 100)
+    })
+  }
+
+  accentColor () {
+    return '#' + systemPreferences.getAccentColor().slice(0, 6)
+  }
+
+  async checkUpdate () {
+    await autoUpdater.checkForUpdates()
+  }
+
+  updateAndRestart () {
+    this.app.destroy(true)
+  }
+
+  async updateReady () {
+    const update = await autoUpdater.checkForUpdates()
+    if (!update) throw new Error('No update available')
+    await update.downloadPromise
+  }
+
+  async spawnPlayer (url: string) {
+    if (!url) throw new Error('No URL provided')
+    if (!url.startsWith('http://localhost:')) throw new Error('Invalid URL')
+    let path = store.get('player')
+    if (!path) throw new Error('No player selected')
+
+    if (process.platform === 'darwin' && extname(path) === '.app') {
+    // Mac: Use executable in packaged .app bundle
+      path += `/Contents/MacOS/${basename(path, '.app')}`
+    }
+
+    player?.kill()
+
+    await new Promise((resolve, reject) => {
+      const playerProcess = spawn(path, [new URL(url).toString()], { stdio: 'ignore' })
+      player = playerProcess
+      this.app.mainWindow.focus()
+      playerProcess.once('close', resolve)
+      playerProcess.once('error', reject)
+    })
+    // this.dispatch('open', `intent://localhost:${this.server.address().port}${found.streamURL}#Intent;type=video/any;scheme=http;end;`)
+  }
+}

@@ -1,0 +1,46 @@
+{
+	"type": "module",
+	"name": "torrent-client",
+	"private": true,
+	"description": "Webtorrent client for Hayase-lite",
+	"main": "index.ts",
+	"version": "1.0.0",
+	"packageManager": "pnpm@10.28.1",
+	"devDependencies": {
+		"@types/node": "^25.9.3",
+		"eslint-config-standard-universal": "^1.0.10",
+		"protobufjs-cli": "^2.5.4",
+		"typescript": "^5.9.3",
+		"undici-types": "^8.5.0"
+	},
+	"scripts": {
+		"build": "tsc",
+		"proto": "pbjs -t static-module -w commonjs -o chromecast/lib/castproto/proto.cjs chromecast/lib/castproto/cast_channel.proto",
+		"protots": "pbts -o chromecast/lib/castproto/proto.d.cts chromecast/lib/castproto/proto.cjs"
+	},
+	"dependencies": {
+		"@silentbot1/nat-api": "^0.4.9",
+		"@types/chromecast-caf-receiver": "^6.0.26",
+		"@types/multicast-dns": "^7.2.4",
+		"abslink": "^1.2.2",
+		"bencode": "^4.0.0",
+		"bitfield": "^4.0.0",
+		"bittorrent-dht": "^11.0.11",
+		"bittorrent-peerid": "^2.0.2",
+		"bittorrent-protocol": "^4.0.0",
+		"cross-fetch-ponyfill": "^1.0.3",
+		"debug": "^4.4.0",
+		"fast-xml-parser": "^5.9.0",
+		"lt_donthave": "^2.0.0",
+		"matroska-metadata": "^1.0.12",
+		"multicast-dns": "^7.2.5",
+		"native": "workspace:*",
+		"network-address": "^1.1.2",
+		"nzb-file": "^1.1.18",
+		"nzb-parser": "1.0.4",
+		"parse-torrent": "^11.0.0",
+		"protobufjs": "8.6.2",
+		"uint8-util": "^2.2.6",
+		"webtorrent": "^3.0.16"
+	}
+}

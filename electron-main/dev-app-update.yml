@@ -1,0 +1,4 @@
+# Auto-updates disabled for Hayase-lite (personal use)
+# provider: generic
+# url: https://hayase.app/auto-updates
+# updaterCacheDirName: hayase-updater
