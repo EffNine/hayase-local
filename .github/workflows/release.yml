@@ -46,9 +46,12 @@ jobs:
             echo "Running: node $ELECTRON_INSTALL"
             node "$ELECTRON_INSTALL" || true
           fi
-          ELECTRON_BIN=$(find . -path "*/electron/dist/electron" -o -path "*/electron/dist/electron.exe" 2>/dev/null | head -1)
-          if [ -n "$ELECTRON_BIN" ]; then
-            echo "Electron binary found: $ELECTRON_BIN"
+          # Check for electron binary across platforms:
+          # Linux: electron/dist/electron
+          # Windows: electron/dist/electron.exe
+          # macOS: electron/dist/Electron.app
+          if find . -path "*/electron/dist/electron" -o -path "*/electron/dist/electron.exe" -o -path "*/electron/dist/Electron.app" 2>/dev/null | grep -q .; then
+            echo "Electron binary found"
           else
             echo "Electron binary not found!"
             exit 1
