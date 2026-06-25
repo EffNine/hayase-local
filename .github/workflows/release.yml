@@ -41,21 +41,23 @@ jobs:
       - name: Ensure Electron binary installed
         shell: bash
         run: |
-          # Find the electron install.js in pnpm store and run it
           ELECTRON_INSTALL=$(find . -path "*/electron/install.js" -not -path "*/electron-*" 2>/dev/null | head -1)
-          if [ -z "$ELECTRON_INSTALL" ]; then
-            echo "electron install.js not found, trying npx..."
-            npx electron --version
-          else
+          if [ -n "$ELECTRON_INSTALL" ]; then
             echo "Running: node $ELECTRON_INSTALL"
-            node "$ELECTRON_INSTALL"
-            npx electron --version
+            node "$ELECTRON_INSTALL" || true
+          fi
+          ELECTRON_BIN=$(find . -path "*/electron/dist/electron" -o -path "*/electron/dist/electron.exe" 2>/dev/null | head -1)
+          if [ -n "$ELECTRON_BIN" ]; then
+            echo "Electron binary found: $ELECTRON_BIN"
+          else
+            echo "Electron binary not found!"
+            exit 1
           fi
 
       - name: Build interface
         run: pnpm --filter ./interface-master build
 
-      - name: Build & package (${{ matrix.platform }})
+      - name: Build and package (${{ matrix.platform }})
         run: pnpm --filter ./electron-main build:${{ matrix.platform }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
