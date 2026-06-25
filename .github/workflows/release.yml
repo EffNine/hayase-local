@@ -38,10 +38,16 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Ensure Electron binary installed
+        shell: bash
+        run: |
+          cd electron-main
+          npx electron --version || (node node_modules/electron/install.js && npx electron --version)
+
       - name: Build interface
         run: pnpm --filter ./interface-master build
 
-      - name: Build Electron app (${{ matrix.platform }})
+      - name: Build & package (${{ matrix.platform }})
         run: pnpm --filter ./electron-main build:${{ matrix.platform }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
