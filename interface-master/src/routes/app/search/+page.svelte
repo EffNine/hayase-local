@@ -1,7 +1,7 @@
 <script lang='ts'>
   import X from 'lucide-svelte/icons/x'
   import { onDestroy, tick } from 'svelte'
-  import MagnifyingGlass from 'svelte-radix/MagnifyingGlass.svelte'
+  import { MagnifyingGlass } from 'svelte-radix'
   import { toast } from 'svelte-sonner'
 
   import { genres, genresSet, tags, years, seasons, formats, status, sort, onlist } from './values'

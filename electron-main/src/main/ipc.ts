@@ -174,7 +174,7 @@ export default class IPC {
   }
 
   version () {
-    app.getVersion()
+    return app.getVersion()
   }
 
   updateProgress () {

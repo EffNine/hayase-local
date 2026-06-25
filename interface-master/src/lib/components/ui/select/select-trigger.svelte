@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { Select as SelectPrimitive } from 'bits-ui'
-  import CaretSort from 'svelte-radix/CaretSort.svelte'
+  import { CaretSort } from 'svelte-radix'
 
   import { cn } from '$lib/utils.js'
 

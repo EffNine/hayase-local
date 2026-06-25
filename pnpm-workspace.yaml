@@ -1,9 +1,20 @@
 packages:
-  - 'native-main'
-  - 'torrent-client-main'
-  - 'interface-master'
-  - 'electron-main'
-overrides:
-  '@vladfrangu/async_event_emitter': npm:@vladfrangu/async_event_emitter@2.4.6
-  '@electron/fuses': npm:@thaunknown/fuses
+  - native-main
+  - torrent-client-main
+  - interface-master
+  - electron-main
 
+onlyBuiltDependencies:
+  - '@paymoapp/electron-shutdown-handler'
+  - '@thaunknown/yencode'
+  - bufferutil
+  - electron-winstaller
+  - esbuild
+  - ip-set
+  - node-datachannel
+  - utf-8-validate
+  - utp-native
+
+overrides:
+  '@electron/fuses': npm:@thaunknown/fuses
+  '@vladfrangu/async_event_emitter': npm:@vladfrangu/async_event_emitter@2.4.6

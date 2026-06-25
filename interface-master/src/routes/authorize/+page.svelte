@@ -1,11 +1,8 @@
 <script lang='ts'>
   import { Separator } from '$lib/components/ui/separator'
+  import { authCallbackValueFromLocation, broadcastAuthCallback } from '$lib/modules/auth/callback'
 
-  const channel = new BroadcastChannel('hayase-lite-auth')
-
-  channel.postMessage(new URL(location.hash.slice('#/authorize'.length), location.origin).search)
-
-  channel.close()
+  broadcastAuthCallback(authCallbackValueFromLocation())
   window.close()
 </script>
 

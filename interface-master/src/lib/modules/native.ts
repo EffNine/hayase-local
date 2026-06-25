@@ -1,3 +1,4 @@
+import { AUTH_CHANNEL } from './auth/callback.ts'
 import ChromeCast from './chromecast.ts'
 import SUPPORTS from './settings/supports'
 
@@ -60,7 +61,7 @@ function makeAuth<T> (popup: Window | null, callback: (data: string) => T | unde
       popup.close()
     }
     const timeout = setTimeout(() => destroy(new Error('Authentication timed out')), 5 * 60 * 1000) // 5 minutes
-    const channel = new BroadcastChannel('hayase-lite-auth')
+    const channel = new BroadcastChannel(AUTH_CHANNEL)
     channel.onmessage = ({ data }) => {
       const res = callback(data)
       if (!res) return
@@ -75,9 +76,10 @@ export default Object.assign<Native, Partial<Native>>({
     return makeAuth(
       open(url, 'authframe', SUPPORTS.isAndroid ? 'popup' : 'popup,width=382,height=582'),
       search => {
-        if (search.startsWith('?al&access_token=')) {
-          return Object.fromEntries(new URLSearchParams(search).entries()) as unknown as AuthResponse
-        }
+        const params = new URLSearchParams(search)
+        if (!params.has('access_token')) return
+
+        return Object.fromEntries(params.entries()) as unknown as AuthResponse
       }
     )
   },
@@ -85,9 +87,10 @@ export default Object.assign<Native, Partial<Native>>({
     return makeAuth(
       open(url, 'authframe', SUPPORTS.isAndroid ? 'popup' : 'popup,width=540,height=782'),
       search => {
-        if (search.startsWith('?code=')) {
-          return Object.fromEntries(new URLSearchParams(search).entries()) as unknown as { code: string, state: string }
-        }
+        const params = new URLSearchParams(search)
+        if (!params.has('code')) return
+
+        return Object.fromEntries(params.entries()) as unknown as { code: string, state: string }
       }
     )
   },

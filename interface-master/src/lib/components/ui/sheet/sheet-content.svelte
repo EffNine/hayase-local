@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { Dialog as SheetPrimitive } from 'bits-ui'
   import { fly } from 'svelte/transition'
-  import Cross2 from 'svelte-radix/Cross2.svelte'
+  import { Cross2 } from 'svelte-radix'
 
   import {
     SheetOverlay,

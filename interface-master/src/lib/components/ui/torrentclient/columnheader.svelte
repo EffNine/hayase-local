@@ -1,6 +1,5 @@
 <script lang='ts'>
-  import ArrowDown from 'svelte-radix/ArrowDown.svelte'
-  import ArrowUp from 'svelte-radix/ArrowUp.svelte'
+  import { ArrowDown, ArrowUp } from 'svelte-radix'
 
   import { Button } from '$lib/components/ui/button'
   import * as DropdownMenu from '$lib/components/ui/dropdown-menu'

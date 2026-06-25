@@ -8,6 +8,7 @@ import { get } from 'svelte/store'
 import { pipe, tap } from 'wonka'
 
 import { anilistClientID } from '../settings'
+import SUPPORTS from '../settings/supports.ts'
 
 import { makeDefaultStorage } from './exchanges/defaultstorage.ts'
 import { cacheOnErrorExchange } from './exchanges/error.ts'
@@ -20,6 +21,7 @@ import schema from './schema.json' with { type: 'json' }
 import type { CombinedError } from '@urql/core'
 import type { ResultOf } from 'gql.tada'
 
+import { dev } from '$app/environment'
 import native from '$lib/modules/native'
 import { safeLocalStorage } from '$lib/utils'
 
@@ -55,7 +57,13 @@ export default new class URQLClient extends Client {
 
   async token () {
     debug('Requesting Anilist token')
-    const res = await native.authAL(`https://anilist.co/api/v2/oauth/authorize?client_id=${get(anilistClientID)}&response_type=token`)
+    const redirect = SUPPORTS.isIOS ? 'hayase-lite://authorize/' : dev ? 'http://localhost:7344/?al' : 'hayase-lite://authorize/'
+    const params = new URLSearchParams({
+      client_id: get(anilistClientID),
+      response_type: 'token',
+      redirect_uri: redirect
+    })
+    const res = await native.authAL(`https://anilist.co/api/v2/oauth/authorize?${params}`)
     const token = res.access_token
     const expires = '' + (Date.now() + (parseInt(res.expires_in) * 1000))
     this.viewer.value = { viewer: this.viewer.value?.viewer ?? null, token, expires }

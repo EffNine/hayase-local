@@ -4,7 +4,10 @@ import SUPPORTS from '$lib/modules/settings/supports'
 
 // this is for MAL, for they don't support hash routing, so we auth to the root and then redirect to the authorize page with the data in search params
 export const init = () => {
-  if (location.pathname === '/' && location.search.startsWith('?code')) history.replaceState(null, '', '/#/authorize' + location.search)
+  if (location.pathname !== '/') return
+  if (!location.search.startsWith('?code') && !location.search.startsWith('?al') && !location.hash.startsWith('#access_token')) return
+
+  history.replaceState(null, '', '/#/authorize' + location.search + location.hash)
 }
 
 if (SUPPORTS.isIOS) {

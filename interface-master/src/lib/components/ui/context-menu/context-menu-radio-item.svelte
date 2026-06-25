@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { ContextMenu as ContextMenuPrimitive } from 'bits-ui'
-  import DotFilled from 'svelte-radix/DotFilled.svelte'
+  import { DotFilled } from 'svelte-radix'
 
   import { cn } from '$lib/utils.js'
 

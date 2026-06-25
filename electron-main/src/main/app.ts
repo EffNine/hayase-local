@@ -3,7 +3,7 @@ import process from 'node:process'
 
 import electronShutdownHandler from '@paymoapp/electron-shutdown-handler'
 import { expose } from 'abslink/electron'
-import { BrowserWindow, MessageChannelMain, app, dialog, ipcMain, powerMonitor, shell, utilityProcess, Tray, Menu, protocol, net, nativeImage, session, nativeTheme, webFrame } from 'electron' // type NativeImage, Notification, nativeImage,
+import { BrowserWindow, MessageChannelMain, app, dialog, ipcMain, powerMonitor, utilityProcess, Tray, Menu, protocol, net, nativeImage, session, nativeTheme, webFrame } from 'electron' // type NativeImage, Notification, nativeImage,
 import log from 'electron-log/main'
 import { autoUpdater } from 'electron-updater'
 
@@ -95,7 +95,7 @@ export default class App {
     nativeTheme.themeSource = 'dark'
 
     // Serve UI from local build in production
-    if (!!app.isPackaged) {
+    if (app.isPackaged) {
       const uiPath = join(process.resourcesPath, 'ui')
       protocol.handle('app', (req) => {
         const url = new URL(req.url)
@@ -126,6 +126,16 @@ export default class App {
           action: 'allow',
           createWindow (options) {
             const win = new BrowserWindow({ ...options, resizable: false, fullscreenable: false, title: 'MyAnimeList', titleBarOverlay: { color: '#ffffff' }, titleBarStyle: 'hidden', backgroundColor: '#ffffff' })
+            win.setMenuBarVisibility(false)
+            win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+            return win.webContents
+          }
+        }
+      } else if (url.startsWith('https://simkl.com/oauth/authorize')) {
+        return {
+          action: 'allow',
+          createWindow (options) {
+            const win = new BrowserWindow({ ...options, resizable: false, fullscreenable: false, title: 'Simkl', titleBarOverlay: { color: '#ffffff' }, titleBarStyle: 'hidden', backgroundColor: '#ffffff' })
             win.setMenuBarVisibility(false)
             win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
             return win.webContents

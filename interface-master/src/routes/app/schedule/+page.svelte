@@ -3,7 +3,7 @@
   import { addMonths, endOfMonth, endOfWeek, format, isSameMonth, isToday, startOfMonth, startOfWeek, subMonths } from 'date-fns'
   import Check from 'lucide-svelte/icons/check'
   import { persisted } from 'svelte-persisted-store'
-  import Cross2 from 'svelte-radix/Cross2.svelte'
+  import { Cross2 } from 'svelte-radix'
   import { tv } from 'tailwind-variants'
 
   import type { Schedule, ScheduleMedia } from '$lib/modules/anilist/queries'

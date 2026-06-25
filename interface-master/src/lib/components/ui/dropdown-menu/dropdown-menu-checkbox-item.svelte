@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { DropdownMenu as DropdownMenuPrimitive } from 'bits-ui'
-  import Check from 'svelte-radix/Check.svelte'
+  import { Check } from 'svelte-radix'
 
   import { cn } from '$lib/utils.js'
 

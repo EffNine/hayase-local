@@ -5,14 +5,15 @@
   "description": "Hayase-lite - Personal torrent streaming app",
   "packageManager": "pnpm@10.28.1",
   "scripts": {
-    "dev": "concurrently \"pnpm --filter ui dev\" \"pnpm --filter electron dev\"",
-    "dev:ui": "pnpm --filter ui dev",
-    "build": "pnpm --filter ui build && pnpm --filter electron build",
+    "dev": "concurrently \"pnpm --filter ./interface-master dev\" \"pnpm --filter ./electron-main dev\"",
+    "dev:ui": "pnpm --filter ./interface-master dev",
+    "build": "pnpm --filter ./interface-master build && pnpm --filter ./electron-main build",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm --filter native build && pnpm --filter torrent-client build && pnpm --filter electron typecheck",
+    "typecheck": "pnpm --filter ./native-main build && pnpm --filter ./torrent-client-main build && pnpm --filter ./electron-main typecheck",
     "clean": "pnpm -r exec rm -rf dist out .output .svelte-kit build node_modules"
   },
   "devDependencies": {
+    "concurrently": "^10.0.3",
     "electron": "42.2.0"
   }
 }

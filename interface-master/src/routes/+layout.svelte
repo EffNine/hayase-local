@@ -13,6 +13,7 @@
   import InstallPrompt, { extensionInstalURL } from '$lib/components/ui/extensions/ExtensionInstallPrompt.svelte'
   import { Menubar } from '$lib/components/ui/menubar'
   import { Toaster } from '$lib/components/ui/sonner'
+  import { broadcastAuthCallback } from '$lib/modules/auth/callback'
   import { sanitizeExtensionUrl } from '$lib/modules/extensions/storage'
   import native from '$lib/modules/native'
   import { inputType } from '$lib/modules/navigate'
@@ -58,6 +59,11 @@
   $: document.documentElement.className = 'dark bg-black theme-' + $settings.theme
 
   native.navigate(({ target, value }) => {
+    if (target === 'authorize' && value) {
+      broadcastAuthCallback(value)
+      return
+    }
+
     if (target !== 'extensions' || !value) return
     extensionInstalURL.set(sanitizeExtensionUrl(new URL(value, 'http://localhost').searchParams.get('url') ?? value))
   })

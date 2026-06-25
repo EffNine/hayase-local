@@ -13,6 +13,18 @@ const pkgName = (pkg: string) => pkg.replace(/@/g, '').replace(/\//g, '-')
 
 const nativeModuleDir = (pkg: string) => `native-modules/${pkgName(pkg)}`
 
+const externalMainDependencies = [
+  /^@silentbot1\//,
+  /^@thaunknown\//,
+  /^debug$/,
+  /^electron$/,
+  /^fast-xml-parser$/,
+  /^multicast-dns$/,
+  /^native$/,
+  /^network-address$/,
+  /^protobufjs/
+]
+
 function copyDirRecursive (src: string, dst: string, fileFilter?: (name: string) => boolean) {
   if (!existsSync(dst)) mkdirSync(dst, { recursive: true })
   for (const entry of readdirSync(src, { withFileTypes: true })) {
@@ -219,12 +231,12 @@ export default defineConfig({
         ignoreDynamicRequires: true
       },
       rollupOptions: {
-        external: [/^@silentbot1\//, /^@thaunknown\//, /^bencode$/, /^bitfield$/, /^bittorrent-/, /^cross-fetch-ponyfill$/, /^debug$/, /^electron$/, /^fast-xml-parser$/, /^http-tracker$/, /^lt_donthave$/, /^matroska-metadata$/, /^multicast-dns$/, /^native$/, /^network-address$/, /^nzb-/, /^parse-torrent$/, /^protobufjs/, /^uint8-util$/, /^webtorrent/]
+        external: externalMainDependencies
       }
     },
     plugins: [
       electronUnzipPlugin(),
-      cjsInterop({ dependencies: ['@paymoapp/electron-shutdown-handler'] }),
+      cjsInterop({ dependencies: ['@paymoapp/electron-shutdown-handler', 'bitfield', 'cross-fetch-ponyfill', 'matroska-metadata'] }),
       license({
         thirdParty: {
           allow: '(MIT OR Apache-2.0 OR ISC OR BSD-3-Clause OR BSD-2-Clause)',
@@ -243,7 +255,7 @@ export default defineConfig({
     ],
     resolve: {
       alias: {
-        'http-tracker': resolve(__dirname, 'node_modules/bittorrent-tracker/lib/client/http-tracker.js'),
+        'http-tracker': resolve(__dirname, '../node_modules/bittorrent-tracker/lib/client/http-tracker.js'),
         'webrtc-polyfill': resolve(__dirname, 'src/main/patches/module.cjs'),
         ws: resolve(__dirname, 'src/main/patches/ws.cjs'),
         '@discordjs/rest': resolve(__dirname, 'src/main/patches/rest.cjs'),

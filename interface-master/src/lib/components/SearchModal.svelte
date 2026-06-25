@@ -1,9 +1,7 @@
 <script lang='ts' context='module'>
   /* eslint-disable no-self-assign */
   import BadgeCheck from 'lucide-svelte/icons/badge-check'
-  import Download from 'svelte-radix/Download.svelte'
-  import File from 'svelte-radix/File.svelte'
-  import MagnifyingGlass from 'svelte-radix/MagnifyingGlass.svelte'
+  import { Download, File, MagnifyingGlass } from 'svelte-radix'
 
   import { SingleCombo } from './ui/combobox'
   import { Input } from './ui/input'

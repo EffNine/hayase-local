@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import Icon from 'lucide-svelte/dist/Icon.svelte'
+  import { Icon } from 'lucide-svelte'
 
   import type { SvelteHTMLElements, SVGAttributes } from 'svelte/elements'
 

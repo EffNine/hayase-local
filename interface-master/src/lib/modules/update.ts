@@ -2,9 +2,10 @@ import { compare, diff } from 'semver'
 
 import native from './native'
 
-import { version } from '$app/environment'
+import { dev, version } from '$app/environment'
 
 async function compareVersions (): Promise<'ui' | 'client' | undefined> {
+  if (dev) return
   const nativeVersion = await native.version()
   const releaseType = diff(version, nativeVersion)
   if (!releaseType) return

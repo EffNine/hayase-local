@@ -50,7 +50,12 @@ export default defineConfig({
       debug: resolve(import.meta.dirname, 'src/patches/debug.ts')
     }
   },
-  server: { port: 7344 },
+  server: {
+    port: 7344,
+    fs: {
+      strict: false
+    }
+  },
   build: {
     target: 'esnext',
     sourcemap: true,

@@ -1,6 +1,6 @@
 import path from 'path'
 
-import { app, shell, type BrowserWindow } from 'electron'
+import { app, type BrowserWindow } from 'electron'
 
 if (process.defaultApp) {
   if (process.argv.length >= 2) {
@@ -11,8 +11,6 @@ if (process.defaultApp) {
 }
 
 export default class Protocol {
-  protocolRx = /hayase-lite:\/\/([a-z0-9]+)\/(.*)/i
-
   window
   constructor (window: BrowserWindow) {
     this.window = window
@@ -32,11 +30,20 @@ export default class Protocol {
   }
 
   _parseProtocol (text: string) {
-    const match = text.match(this.protocolRx)
-    if (!match) return null
+    let url: URL
+    try {
+      url = new URL(text)
+    } catch {
+      return null
+    }
+
+    if (url.protocol !== 'hayase-lite:') return null
+
+    const value = `${url.pathname.replace(/^\//, '')}${url.search}${url.hash}`
+
     return {
-      target: match[1]!,
-      value: match[2]
+      target: url.hostname,
+      value
     }
   }
 

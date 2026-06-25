@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { DataBodyRow, Render, Subscribe, createRender, createTable } from 'svelte-headless-table'
   import { addSelectedRows, addSortBy, addTableFilter } from 'svelte-headless-table/plugins'
-  import MagnifyingGlass from 'svelte-radix/MagnifyingGlass.svelte'
+  import { MagnifyingGlass } from 'svelte-radix'
   import { toast } from 'svelte-sonner'
 
   import { Button } from '../../button'
