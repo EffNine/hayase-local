@@ -41,8 +41,16 @@ jobs:
       - name: Ensure Electron binary installed
         shell: bash
         run: |
-          cd electron-main
-          npx electron --version || (node node_modules/electron/install.js && npx electron --version)
+          # Find the electron install.js in pnpm store and run it
+          ELECTRON_INSTALL=$(find . -path "*/electron/install.js" -not -path "*/electron-*" 2>/dev/null | head -1)
+          if [ -z "$ELECTRON_INSTALL" ]; then
+            echo "electron install.js not found, trying npx..."
+            npx electron --version
+          else
+            echo "Running: node $ELECTRON_INSTALL"
+            node "$ELECTRON_INSTALL"
+            npx electron --version
+          fi
 
       - name: Build interface
         run: pnpm --filter ./interface-master build
