@@ -401,7 +401,7 @@ export const extensions = new class Extensions {
       malId: media.idMal ?? undefined,
       titles: this.createTitles(media),
       chapter,
-      language,
+      language
     }
   }
 
@@ -412,8 +412,8 @@ export const extensions = new class Extensions {
     for (const [id] of storage.codeManager.extensions.entries()) {
       if (!extopts[id]?.enabled) continue
       if (configs[id]?.type !== type) continue
-      const config = configs[id]!
-      const readingDirection: ReadingDirection | undefined = 'readingDirection' in config ? config.readingDirection as ReadingDirection : undefined
+      const config = configs[id]
+      const readingDirection: ReadingDirection | undefined = 'readingDirection' in config ? config.readingDirection! : undefined
       yield { id, name: config.name, readingDirection }
     }
   }

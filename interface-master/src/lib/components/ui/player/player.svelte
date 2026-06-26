@@ -756,7 +756,6 @@
     paused = state.paused
   }
 
-
   function loadAnimeProgress () {
     if (!mediaInfo.media.id || !mediaInfo.episode) return
 

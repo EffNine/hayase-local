@@ -3,8 +3,8 @@ import { get } from 'svelte/store'
 
 import type { PageLoad } from './$types'
 
-import { IDMedia } from '$lib/modules/anilist/queries'
 import { asyncStore } from '$lib/modules/anilist/client'
+import { IDMedia } from '$lib/modules/anilist/queries'
 
 export const load: PageLoad = async ({ params }) => {
   const id = Number(params.id)

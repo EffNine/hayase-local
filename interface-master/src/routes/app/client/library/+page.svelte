@@ -1,26 +1,28 @@
 <script lang='ts'>
-  import { LibraryTable } from '$lib/components/ui/torrentclient'
-  import * as Tabs from '$lib/components/ui/tabs'
-  import client from '$lib/modules/anilist/client'
-  import { cover, title as titleFn } from '$lib/modules/anilist'
-  import { Load } from '$lib/components/ui/img'
   import { goto } from '$app/navigation'
+  import { Load } from '$lib/components/ui/img'
+  import * as Tabs from '$lib/components/ui/tabs'
+  import { LibraryTable } from '$lib/components/ui/torrentclient'
+  import { cover, title as titleFn } from '$lib/modules/anilist'
+  import client from '$lib/modules/anilist/client'
   import { cachedChapterCount } from '$lib/modules/cache'
-  import type { Media } from '$lib/modules/anilist'
 
   // ponytail: subscribe to client.mangalists (a derived store on the client instance)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  type MangaEntry = any
   const mangalist = client.mangalists
-  $: mangaEntries = $mangalist?.data?.MediaListCollection?.lists?.flatMap((l: any) => l?.entries ?? []) ?? []
+  $: mangaEntries = $mangalist?.data?.MediaListCollection?.lists?.flatMap((l: MangaEntry) => l?.entries ?? []) ?? []
 
   let cachedCounts: Record<number, number> = {}
-  $: if (mangaEntries.length) {
-    mangaEntries.forEach(async (e: any) => {
-      if (e?.media?.id) {
+  async function updateCachedCounts () {
+    for (const e of mangaEntries) {
+      if (e?.media?.id && !(e.media.id in cachedCounts)) {
         const count = await cachedChapterCount(e.media.id)
         cachedCounts = { ...cachedCounts, [e.media.id]: count }
       }
-    })
+    }
   }
+  $: mangaEntries.length && updateCachedCounts()
 
   function openReader (id: number) {
     goto(`/#/app/reader/${id}`)
@@ -44,7 +46,7 @@
       {:else}
         <div class='grid grid-cols-[repeat(auto-fill,minmax(160px,max-content))] gap-4 p-4'>
           {#each mangaEntries as entry (entry?.media?.id)}
-            {@const media = entry?.media as Media | undefined}
+            {@const media = entry?.media}
             {#if media}
               <button class='flex flex-col gap-2 text-left' on:click={() => openReader(media.id)}>
                 <div class='w-[140px] h-[200px] rounded overflow-hidden bg-muted'>

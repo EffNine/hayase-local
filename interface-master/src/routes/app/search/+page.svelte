@@ -235,16 +235,21 @@
 
   // ponytail: media-type filter — Anime / Manga / All. Maps to AniList $type variable.
   let mediaType: 'ANIME' | 'MANGA' | undefined = 'ANIME'
+  const mediaTypeOptions = [
+    { v: 'ANIME' as const, label: 'Anime' },
+    { v: 'MANGA' as const, label: 'Manga' },
+    { v: undefined as const, label: 'All' }
+  ]
 </script>
 
 <div class='flex flex-col h-full overflow-y-auto overflow-x-clip -ml-14 pl-14 min-w-0 grow' use:dragScroll use:infiniteScroll>
   <div class='sticky top-0 z-20 px-2 sm:px-10 pointer-events-auto shrink-0 overflow-clip bg-background pt-5'>
     <!-- ponytail: media-type filter toggle -->
     <div class='flex gap-1 mb-3'>
-      {#each [{ v: 'ANIME', label: 'Anime' }, { v: 'MANGA', label: 'Manga' }, { v: undefined, label: 'All' }] as opt}
+      {#each mediaTypeOptions as opt (opt.label)}
         <button
-          class='px-3 py-1 text-xs font-bold rounded transition-colors {mediaType === opt.v ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground hover:bg-accent/50"}'
-          on:click={() => { mediaType = opt.v as 'ANIME' | 'MANGA' | undefined; searchChanged(search) }}
+          class='px-3 py-1 text-xs font-bold rounded transition-colors {mediaType === opt.v ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground hover:bg-accent/50'}'
+          on:click={() => { mediaType = opt.v; searchChanged(search) }}
         >
           {opt.label}
         </button>

@@ -39,7 +39,7 @@
   }
 
   function manualUpdate () {
-    // Update URL removed in Hayase-lite
+  // Update URL removed in Hayase-lite
   }
 
   const viewer = client.viewer

@@ -1,19 +1,16 @@
 <script lang='ts'>
-  import { get } from 'svelte/store'
+  import ChevronLeft from 'lucide-svelte/icons/chevron-left'
   import { toast } from 'svelte-sonner'
 
   import type { PageData } from './$types'
 
-  import { extensions } from '$lib/modules/extensions/extensions'
-  import { getCachedChapter, setCachedChapter } from '$lib/modules/cache'
-  import { authAggregator as auth } from '$lib/modules/auth'
-  import { IDMedia } from '$lib/modules/anilist/queries'
-
+  import { goto } from '$app/navigation'
   import MangaReader from '$lib/components/readers/MangaReader.svelte'
   import NovelReader from '$lib/components/readers/NovelReader.svelte'
   import { Button } from '$lib/components/ui/button'
-  import ChevronLeft from 'lucide-svelte/icons/chevron-left'
-  import { goto } from '$app/navigation'
+  import { authAggregator as auth } from '$lib/modules/auth'
+  import { getCachedChapter, setCachedChapter } from '$lib/modules/cache'
+  import { extensions } from '$lib/modules/extensions/extensions'
 
   export let data: PageData
 
@@ -97,7 +94,7 @@
       const result = await extensions.readerChapter({ media, type, chapter, sourceId: selectedSourceId, language: 'en' })
       await setCachedChapter(selectedSourceId, media.id, chapter, 'en', { title: result.title, pages: result.pages, html: result.html })
     } catch {
-      // silent fail for preload
+    // silent fail for preload
     }
   }
 
@@ -128,7 +125,7 @@
     try {
       await auth.entry({ id: media.id, progress: chapter, status: 'CURRENT' })
     } catch {
-      // silent fail — progress sync is best-effort
+    // silent fail — progress sync is best-effort
     }
   }
 
@@ -176,7 +173,7 @@
         <div class='flex flex-col'>
           {#each [...chapters].reverse() as ch (ch.chapter)}
             <button
-              class='text-left px-3 py-2 text-xs hover:bg-muted transition-colors border-b border-border/50 {currentChapter === ch.chapter ? "bg-accent font-bold" : ""}'
+              class='text-left px-3 py-2 text-xs hover:bg-muted transition-colors border-b border-border/50 {currentChapter === ch.chapter ? 'bg-accent font-bold' : ''}'
               on:click={() => openChapter(ch.chapter)}
             >
               <div class='truncate'>Chapter {ch.chapter}</div>

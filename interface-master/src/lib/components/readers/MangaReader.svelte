@@ -44,7 +44,7 @@
 <div class='flex flex-col h-full'>
   <!-- Reader controls -->
   <div class='flex items-center gap-2 px-4 py-2 bg-muted border-b border-border shrink-0'>
-    <button class='text-xs px-2 py-1 rounded hover:bg-accent' on:click={() => mode = mode === 'page' ? 'vertical' : 'page'}>
+    <button class='text-xs px-2 py-1 rounded hover:bg-accent' on:click={() => { mode = mode === 'page' ? 'vertical' : 'page' }}>
       {mode === 'page' ? 'Scroll' : 'Pages'}
     </button>
     <div class='flex-1' />
