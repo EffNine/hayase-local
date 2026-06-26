@@ -142,6 +142,7 @@
     const search = {
       page,
       ids: filter.ids,
+      type: mediaType,
       search: filter.name,
       onList: filter.onList?.[0]?.value === 'true' ? true : filter.onList?.[0]?.value === 'false' ? false : undefined,
       genre: genre?.length ? genre : undefined,
@@ -231,10 +232,24 @@
   const viewer = client.client.viewer
 
   let pressed = false
+
+  // ponytail: media-type filter — Anime / Manga / All. Maps to AniList $type variable.
+  let mediaType: 'ANIME' | 'MANGA' | undefined = 'ANIME'
 </script>
 
 <div class='flex flex-col h-full overflow-y-auto overflow-x-clip -ml-14 pl-14 min-w-0 grow' use:dragScroll use:infiniteScroll>
   <div class='sticky top-0 z-20 px-2 sm:px-10 pointer-events-auto shrink-0 overflow-clip bg-background pt-5'>
+    <!-- ponytail: media-type filter toggle -->
+    <div class='flex gap-1 mb-3'>
+      {#each [{ v: 'ANIME', label: 'Anime' }, { v: 'MANGA', label: 'Manga' }, { v: undefined, label: 'All' }] as opt}
+        <button
+          class='px-3 py-1 text-xs font-bold rounded transition-colors {mediaType === opt.v ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground hover:bg-accent/50"}'
+          on:click={() => { mediaType = opt.v as 'ANIME' | 'MANGA' | undefined; searchChanged(search) }}
+        >
+          {opt.label}
+        </button>
+      {/each}
+    </div>
     <div class='flex flex-wrap'>
       {#if !$breakpoints.md}
         <div class='grid items-center min-w-0 flex-1 p-2'>

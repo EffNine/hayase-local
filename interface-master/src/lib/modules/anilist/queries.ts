@@ -174,12 +174,12 @@ export const UserFrag = gql(`
 `)
 
 export const Search = gql(`
-  query Search($page: Int, $perPage: Int, $search: String, $genre: [String], $tag: [String], $format: [MediaFormat], $status: [MediaStatus], $statusNot: [MediaStatus], $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean, $sort: [MediaSort], $onList: Boolean, $ids: [Int], $nsfw: [String]) {
+  query Search($page: Int, $perPage: Int, $search: String, $genre: [String], $tag: [String], $format: [MediaFormat], $status: [MediaStatus], $statusNot: [MediaStatus], $season: MediaSeason, $seasonYear: Int, $isAdult: Boolean, $sort: [MediaSort], $onList: Boolean, $ids: [Int], $nsfw: [String], $type: MediaType) {
     Page(page: $page, perPage: $perPage) {
       pageInfo {
         hasNextPage
       },
-      media(type: ANIME, format_not: MUSIC, id_in: $ids, search: $search, genre_in: $genre, tag_in: $tag, format_in: $format, status_in: $status, status_not_in: $statusNot, season: $season, seasonYear: $seasonYear, isAdult: $isAdult, sort: $sort, onList: $onList, genre_not_in: $nsfw) {
+      media(type: $type, format_not: MUSIC, id_in: $ids, search: $search, genre_in: $genre, tag_in: $tag, format_in: $format, status_in: $status, status_not_in: $statusNot, season: $season, seasonYear: $seasonYear, isAdult: $isAdult, sort: $sort, onList: $onList, genre_not_in: $nsfw) {
         ...FullMedia
       }
     }
@@ -187,8 +187,8 @@ export const Search = gql(`
 `, [FullMedia])
 
 export const IDMedia = gql(`
-  query IDMedia($id: Int!) {
-    Media(id: $id, type: ANIME) {
+  query IDMedia($id: Int!, $type: MediaType) {
+    Media(id: $id, type: $type) {
       ...FullMedia
     }
   }

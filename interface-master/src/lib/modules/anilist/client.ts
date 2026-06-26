@@ -89,7 +89,7 @@ class AnilistClient {
   })
 
   search (variables: VariablesOf<typeof Search>, pause?: boolean) {
-    return queryStore({ client: this.client, query: Search, variables: { ...variables, nsfw: get(nsfw) }, pause })
+    return queryStore({ client: this.client, query: Search, variables: { type: 'ANIME', ...variables, nsfw: get(nsfw) }, pause })
   }
 
   async searchCompound (flattenedTitles: Array<{key: string, title: string, year?: string, isAdult: boolean}>) {
