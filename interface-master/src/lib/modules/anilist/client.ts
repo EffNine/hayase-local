@@ -44,7 +44,13 @@ class AnilistClient {
 
   userlists = derived<typeof this.viewerID, OperationResultState<ResultOf<typeof UserLists>> | undefined>(this.viewerID, (id, set) => {
     if (!id) return
-    return queryStore({ client: this.client, query: UserLists, variables: { id }, context: { requestPolicy: 'cache-and-network' } }).subscribe(set)
+    return queryStore({ client: this.client, query: UserLists, variables: { id, type: 'ANIME' }, context: { requestPolicy: 'cache-and-network' } }).subscribe(set)
+  })
+
+  // ponytail: manga reading list — same query but type: MANGA
+  mangalists = derived<typeof this.viewerID, OperationResultState<ResultOf<typeof UserLists>> | undefined>(this.viewerID, (id, set) => {
+    if (!id) return
+    return queryStore({ client: this.client, query: UserLists, variables: { id, type: 'MANGA' }, context: { requestPolicy: 'cache-and-network' } }).subscribe(set)
   })
 
   continueIDs = derivedArray(this.userlists, $userLists => {

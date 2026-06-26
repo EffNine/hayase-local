@@ -223,8 +223,8 @@ export const Viewer = gql(`
 `, [UserFrag])
 
 export const UserLists = gql(`
-  query UserLists($id: Int) {
-    MediaListCollection(userId: $id, type: ANIME, forceSingleCompletedList: true, sort: UPDATED_TIME_DESC) {
+  query UserLists($id: Int, $type: MediaType) {
+    MediaListCollection(userId: $id, type: $type, forceSingleCompletedList: true, sort: UPDATED_TIME_DESC) {
       user {
         id
       }
