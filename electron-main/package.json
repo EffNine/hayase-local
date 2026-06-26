@@ -1,6 +1,6 @@
 {
   "name": "hayase-lite",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Hayase-lite - Personal torrent streaming app",
   "main": "./out/main/index.js",
   "repository": "github:afnanrudy/hayase-lite",
