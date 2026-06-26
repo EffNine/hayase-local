@@ -9,7 +9,7 @@ import { settings, type videoResolutions } from '../settings'
 
 import { storage } from './storage'
 
-import type { TorrentResult, ReaderQuery } from './types'
+import type { TorrentResult, ReaderQuery, ReadingDirection } from './types'
 import type { EpisodesResponse, Titles, Episode } from '../anizip/types'
 import type { AnitomyResult } from 'anitomyscript'
 
@@ -405,7 +405,7 @@ export const extensions = new class Extensions {
     }
   }
 
-  async * readerSources ({ media, type }: { media: Media, type: 'manga' | 'novel' }): AsyncGenerator<{ id: string, name: string, readingDirection?: string }> {
+  async * readerSources ({ media, type }: { media: Media, type: 'manga' | 'novel' }): AsyncGenerator<{ id: string, name: string, readingDirection?: ReadingDirection }> {
     await storage.ready
     const extopts = get(extensionOptions)
     const configs = get(savedConfigs)
@@ -413,7 +413,8 @@ export const extensions = new class Extensions {
       if (!extopts[id]?.enabled) continue
       if (configs[id]?.type !== type) continue
       const config = configs[id]!
-      yield { id, name: config.name, readingDirection: 'readingDirection' in config ? config.readingDirection : undefined }
+      const readingDirection: ReadingDirection | undefined = 'readingDirection' in config ? config.readingDirection as ReadingDirection : undefined
+      yield { id, name: config.name, readingDirection }
     }
   }
 
