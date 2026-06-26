@@ -4,13 +4,20 @@
   import { MANIFEST_VERSION } from '$lib/modules/extensions/storage'
   import { codeToEmoji } from '$lib/utils'
 
-  export let config: ExtensionConfig
-
   const typeMap: Record<string, string> = {
     nzb: 'NZB',
     torrent: 'Torrent',
-    subtitle: 'Subtitle'
+    subtitle: 'Subtitle',
+    manga: 'Manga',
+    novel: 'Novel'
   }
+
+  export let config: ExtensionConfig
+
+  // ponytail: access torrent/nzb-only fields via optional narrowing — these are only on TorrentExtensionConfig | NZBExtensionConfig
+  $: accuracy = 'accuracy' in config ? config.accuracy : null
+  $: ratio = 'ratio' in config ? config.ratio : null
+  $: media = 'media' in config ? config.media : null
 </script>
 
 <div class='bg-muted px-4 py-3 rounded-md flex flex-row space-x-3 justify-between w-full'>
@@ -31,16 +38,20 @@
     <div class='flex-wrap-balance w-full justify-start gap-2 flex text-popover-foreground text-sm'>
       <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap'>{config.version}</div>
       <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap'>{typeMap[config.type] ?? config.type}</div>
-      <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap capitalize'>{config.accuracy} Accuracy</div>
+      {#if accuracy}
+        <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap capitalize'>{accuracy} Accuracy</div>
+      {/if}
       {#if config.deprecated}
         <div class='rounded px-3 py-0.5 font-bold bg-yellow-800 leading-snug text-nowrap'>Deprecated</div>
       {:else if config.manifestVersion !== MANIFEST_VERSION}
         <div class='rounded px-3 py-0.5 font-bold bg-red-900 leading-snug text-nowrap'>Outdated</div>
       {/if}
-      {#if config.ratio}
-        <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap'>{config.ratio} Ratio</div>
+      {#if ratio}
+        <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap'>{ratio} Ratio</div>
       {/if}
-      <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap capitalize'>{config.media}</div>
+      {#if media}
+        <div class='rounded px-3 py-0.5 font-bold bg-accent leading-snug text-nowrap capitalize'>{media}</div>
+      {/if}
       {#if config.languages}
         <div class='font-twemoji text-xl leading-none content-center line-clamp-1'>
           {#each config.languages as lang, i (i)}

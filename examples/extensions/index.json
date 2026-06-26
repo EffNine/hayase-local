@@ -1,0 +1,72 @@
+[
+  {
+    "manifestVersion": 2,
+    "deprecated": false,
+    "name": "Dummy Torrent",
+    "id": "dummy-torrent",
+    "version": "0.0.1",
+    "type": "torrent",
+    "accuracy": "low",
+    "media": "both",
+    "languages": ["ALL"],
+    "description": "Reference example — returns placeholder torrents. Not a real source.",
+    "icon": "https://placehold.co/64x64/png",
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-torrent.js"
+  },
+  {
+    "manifestVersion": 2,
+    "deprecated": false,
+    "name": "Dummy NZB",
+    "id": "dummy-nzb",
+    "version": "0.0.1",
+    "type": "nzb",
+    "accuracy": "low",
+    "media": "both",
+    "languages": ["ALL"],
+    "description": "Reference example — returns placeholder NZBs. Not a real source.",
+    "icon": "https://placehold.co/64x64/png",
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-nzb.js"
+  },
+  {
+    "manifestVersion": 2,
+    "deprecated": false,
+    "name": "Dummy Subtitle",
+    "id": "dummy-subtitle",
+    "version": "0.0.1",
+    "type": "subtitle",
+    "languages": ["ALL"],
+    "description": "Reference example — returns placeholder subtitles. Not a real source.",
+    "icon": "https://placehold.co/64x64/png",
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-subtitle.js"
+  },
+  {
+    "manifestVersion": 2,
+    "deprecated": false,
+    "name": "Dummy Manga",
+    "id": "dummy-manga",
+    "version": "0.0.1",
+    "type": "manga",
+    "languages": ["ALL"],
+    "readingDirection": "rtl",
+    "description": "Reference example — returns placeholder manga pages. Not a real source.",
+    "icon": "https://placehold.co/64x64/png",
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-manga.js"
+  },
+  {
+    "manifestVersion": 2,
+    "deprecated": false,
+    "name": "Dummy Novel",
+    "id": "dummy-novel",
+    "version": "0.0.1",
+    "type": "novel",
+    "languages": ["ALL"],
+    "description": "Reference example — returns placeholder novel text. Not a real source.",
+    "icon": "https://placehold.co/64x64/png",
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-novel.js"
+  }
+]

@@ -10,7 +10,7 @@ import native from '../native.ts'
 
 import Worker from './worker?worker'
 
-import type { ExtensionConfig } from './types'
+import type { ExtensionConfig, ExtensionType } from './types'
 import type extensionLoader from './worker'
 
 const debug = Debug('ui:extensions')
@@ -109,7 +109,7 @@ class CodeManager {
   async initiate (configs: ExtensionConfig[]) {
     debug('Initiating extensions', configs.map(c => c.id))
     const configIDs = configs.map(c => c.id)
-    const urls = configs.filter(c => !!c.url).map(c => atob(c.url!))
+    const urls = configs.flatMap(c => c.url ? (Array.isArray(c.url) ? c.url : [c.url]).map(u => atob(u)) : [])
     await this.enableCORS(urls)
 
     const codeList = await getMany<string>(configIDs)
@@ -164,7 +164,7 @@ class CodeManager {
     return invalidIDs
   }
 
-  async _loadWorker (code: string, id: string, type: 'torrent' | 'nzb' | 'subtitle') {
+  async _loadWorker (code: string, id: string, type: ExtensionType) {
     debug('Creating worker for', id)
     const Loader = wrap<typeof extensionLoader>(new Worker({ name: id })) as unknown as Remote<typeof extensionLoader>
 
@@ -203,7 +203,8 @@ export const storage = new class ConfigManager {
   }
 
   _validateConfig (config: Partial<ExtensionConfig> | null): boolean {
-    const valid = !!config && ['name', 'version', 'id', 'type', 'accuracy', 'icon', 'update', 'code'].every(prop => prop in (config ?? {}))
+    const required = ['name', 'version', 'id', 'type', 'icon', 'update', 'code']
+    const valid = !!config && required.every(prop => prop in (config ?? {}))
     debug('_validateConfig', config, 'result:', valid)
     return valid
   }
@@ -227,7 +228,7 @@ export const storage = new class ConfigManager {
       for (const c of configs) {
         newConfigs[c.id] = c
       }
-      this.codeManager.enableCORS(Object.values(newConfigs).filter(c => !!c.url).map(c => atob(c.url!)))
+      this.codeManager.enableCORS(Object.values(newConfigs).flatMap(c => c.url ? (Array.isArray(c.url) ? c.url : [c.url]).map(u => atob(u)) : []))
       return newConfigs
     })
   }
@@ -263,7 +264,7 @@ export const storage = new class ConfigManager {
       }
     }
 
-    const urls = validConfigs.filter(c => !!c.url).map(c => atob(c.url!))
+    const urls = validConfigs.flatMap(c => c.url ? (Array.isArray(c.url) ? c.url : [c.url]).map(u => atob(u)) : [])
     await this.codeManager.enableCORS(urls)
 
     const invalidExtensions = await this.codeManager.downloadScripts(validConfigs)

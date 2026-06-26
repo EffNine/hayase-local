@@ -10,7 +10,8 @@
 		"typescript": "^5.8.3"
 	},
 	"scripts": {
-		"build": "tsc"
+		"build": "tsc --noEmit",
+		"typecheck": "tsc --noEmit"
 	},
 	"dependencies": {
 		"@types/chromecast-caf-receiver": "^6.0.26"

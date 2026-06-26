@@ -26,6 +26,16 @@ git push origin v0.1.0
 
 Downloads are published to [GitHub Releases](https://github.com/afnanrudy/hayase-lite/releases).
 
+### macOS install
+
+The macOS build is unsigned. To open it the first time, run:
+
+```sh
+xattr -cr /Applications/Hayase-lite.app
+```
+
+Or right-click the app → **Open** → **Open anyway** in the Gatekeeper dialog.
+
 ## License
 
 Business Source License 1.1 (BUSL-1.1). See [LICENSE](./LICENSE).

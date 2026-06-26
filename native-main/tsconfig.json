@@ -1,10 +1,15 @@
 {
   "extends": "eslint-config-standard-universal/tsconfig.json",
   "compilerOptions": {
-    "allowImportingTsExtensions": false,
-    "rewriteRelativeImportExtensions": false,
-    "outDir": null,
-    "skipLibCheck": true
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "noEmit": true,
+    "declaration": false,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "allowJs": false,
+    "checkJs": false,
+    "maxNodeModuleJsDepth": 0
   },
   "include": [
     "./*.ts"

@@ -3,7 +3,7 @@ import { expose } from 'abslink/w3c'
 
 import SUPPORTS from '../settings/supports'
 
-import type { NZBQuery, SearchOptions, AnimeQuery, TorrentResult, TorrentSource, NZBSource, SubtitleSource, Accuracy } from './types'
+import type { NZBQuery, SearchOptions, AnimeQuery, TorrentResult, TorrentSource, NZBSource, SubtitleSource, MangaSource, NovelSource, ReaderQuery, ChapterInfo, MangaChapterResult, NovelChapterResult, Accuracy, ExtensionType } from './types'
 
 const _fetch = SUPPORTS.isIOS
   ? (input: RequestInfo | URL, init?: RequestInit) => {
@@ -22,7 +22,7 @@ interface AccuracyRule {
   setTo: Accuracy
   maxAllowed: Accuracy
 }
-type TSource = { url: string } & (TorrentSource | NZBSource | SubtitleSource)
+type TSource = { url: string } & (TorrentSource | NZBSource | SubtitleSource | MangaSource | NovelSource)
 
 const ACCURACIES = ['high', 'medium', 'low'] as const
 const ACCURACY_RANK: Record<Accuracy, number> = { high: 0, medium: 1, low: 2 }
@@ -30,20 +30,20 @@ const ACCURACY_RANK: Record<Accuracy, number> = { high: 0, medium: 1, low: 2 }
 const RESULT_TYPES = ['batch', 'best', 'alt', undefined] as const
 
 const QUERY_RULES: Record<string, AccuracyRule> = {
-  anilistId: { setTo: 'medium', maxAllowed: 'high' }, // for people cheating using AL API to get media
+  anilistId: { setTo: 'medium', maxAllowed: 'high' },
   anidbAid: { setTo: 'medium', maxAllowed: 'high' },
-  anidbEid: { setTo: 'high', maxAllowed: 'high' }, // usually means super duper accurate since manual mapping
+  anidbEid: { setTo: 'high', maxAllowed: 'high' },
   tvdbId: { setTo: 'medium', maxAllowed: 'high' },
-  tvdbEId: { setTo: 'high', maxAllowed: 'high' }, // usually means super duper accurate since manual mapping
+  tvdbEId: { setTo: 'high', maxAllowed: 'high' },
   imdbId: { setTo: 'medium', maxAllowed: 'high' },
   tmdbId: { setTo: 'medium', maxAllowed: 'high' },
-  episode: { setTo: 'low', maxAllowed: 'high' }, // allow high since it might be a direct AL API mapping
-  episodeCount: { setTo: 'low', maxAllowed: 'high' }, // this is for verifying if something is a batch
-  absoluteEpisodeNumber: { setTo: 'low', maxAllowed: 'medium' }, // likely means some sketchy stuff is happening
+  episode: { setTo: 'low', maxAllowed: 'high' },
+  episodeCount: { setTo: 'low', maxAllowed: 'high' },
+  absoluteEpisodeNumber: { setTo: 'low', maxAllowed: 'medium' },
   resolution: { setTo: 'low', maxAllowed: 'high' },
   exclusions: { setTo: 'medium', maxAllowed: 'high' },
-  titles: { setTo: 'low', maxAllowed: 'medium' }, // string matching, NO!
-  media: { setTo: 'low', maxAllowed: 'medium' } // yeah, this should be a red flag
+  titles: { setTo: 'low', maxAllowed: 'medium' },
+  media: { setTo: 'low', maxAllowed: 'medium' }
 }
 
 function queryProxy<T extends object> (query: T): { proxy: T, accessed: Set<string> } {
@@ -108,16 +108,18 @@ type WorkerState =
   | { type: 'torrent', mod: TorrentSource & { url: string } }
   | { type: 'nzb', mod: NZBSource & { url: string } }
   | { type: 'subtitle', mod: SubtitleSource & { url: string } }
+  | { type: 'manga', mod: MangaSource & { url: string } }
+  | { type: 'novel', mod: NovelSource & { url: string } }
 
 export class ExtensionWorker {
   private _state: WorkerState | null = null
   mod!: Promise<{ url: string } & { test: () => Promise<boolean> }>
 
-  construct (code: string, type: 'torrent' | 'nzb' | 'subtitle') {
+  construct (code: string, type: ExtensionType) {
     this.mod = this.load(code, type)
   }
 
-  async load (code: string, type: 'torrent' | 'nzb' | 'subtitle'): Promise<TSource> {
+  async load (code: string, type: ExtensionType): Promise<TSource> {
     // WARN: unsafe eval
     const url = URL.createObjectURL(new Blob([code], { type: 'application/javascript' }))
     const module = await import(/* @vite-ignore */url)
@@ -188,6 +190,21 @@ export class ExtensionWorker {
     if (state.type !== 'torrent') return []
     const { proxy, accessed } = queryProxy({ ...query, fetch: _fetch })
     return sanitizeResults(await state.mod.movie(proxy, options), computeAccuracy(accessed))
+  }
+
+  async chapters (query: Omit<ReaderQuery, 'chapter'>, options?: SearchOptions): Promise<ChapterInfo[]> {
+    const state = this._state!
+    if (state.type !== 'manga' && state.type !== 'novel') throw new Error('chapters not supported for this source type')
+    const result = await state.mod.chapters({ ...query, fetch: _fetch }, options)
+    if (!Array.isArray(result)) return []
+    return result.filter(c => c && typeof c.chapter === 'number')
+  }
+
+  async chapter (query: ReaderQuery, options?: SearchOptions): Promise<MangaChapterResult | NovelChapterResult> {
+    const state = this._state!
+    if (state.type !== 'manga' && state.type !== 'novel') throw new Error('chapter not supported for this source type')
+    // ponytail: no accuracy proxy for manga/novel — pass query directly
+    return await state.mod.chapter({ ...query, fetch: _fetch }, options)
   }
 
   async test () {

@@ -10,55 +10,87 @@ export type SearchOptions = Record<string, {
   default: any
 }>
 
-export interface ExtensionConfig {
+export type ExtensionType = 'torrent' | 'nzb' | 'subtitle' | 'manga' | 'novel'
+
+export type ReadingDirection = 'rtl' | 'ltr' | 'vertical'
+
+interface BaseExtensionConfig {
   manifestVersion: number
   deprecated: boolean
   name: string
   version: string
-  description: string
+  description?: string
   id: string
-  type: 'torrent' | 'nzb' | 'subtitle'
-  accuracy: Accuracy
-  ratio?: 'perma' | number
-  icon: string // URL to the icon
-  media: 'sub' | 'dub' | 'both'
-  url?: string // URL to enable CORS on the extension's API
-  languages: CountryCodes[] // languages for sub/dub, this doesn't include the languages of the source itself, aka raw sub impiles you can turn it off and just get raw in japanese
-  update?: string // URL to the config file, can be prefixed with 'gh:' to fetch from GitHub, e.g. 'gh:username/repo' or 'npm:' to fetch from npm, e.g. 'npm:package-name', or a straight url
-  code: string // URL to the extension code, can be prefixed with 'gh:' to fetch from GitHub, e.g. 'gh:username/repo' or 'npm:' to fetch from npm, e.g. 'npm:package-name', a straight url, or file: for inline code
+  type: ExtensionType
+  icon: string
+  url?: string | string[]
+  languages: CountryCodes[]
+  update?: string
+  code: string
   options?: SearchOptions
-  updatePeers?: false // whether to update the peer counts for torrents returned by this extension, this is only applicable for torrent sources and will be ignored for nzb and url sources
+  nsfw?: boolean
+  rateLimit?: number
 }
 
+export interface TorrentExtensionConfig extends BaseExtensionConfig {
+  type: 'torrent'
+  accuracy: Accuracy
+  ratio?: 'perma' | number
+  media: 'sub' | 'dub' | 'both'
+  updatePeers?: false
+}
+
+export interface NZBExtensionConfig extends BaseExtensionConfig {
+  type: 'nzb'
+  accuracy: Accuracy
+  ratio?: 'perma' | number
+  media: 'sub' | 'dub' | 'both'
+}
+
+export interface SubtitleExtensionConfig extends BaseExtensionConfig {
+  type: 'subtitle'
+}
+
+export interface MangaExtensionConfig extends BaseExtensionConfig {
+  type: 'manga'
+  readingDirection?: ReadingDirection
+}
+
+export interface NovelExtensionConfig extends BaseExtensionConfig {
+  type: 'novel'
+}
+
+export type ExtensionConfig = TorrentExtensionConfig | NZBExtensionConfig | SubtitleExtensionConfig | MangaExtensionConfig | NovelExtensionConfig
+
 export interface TorrentResult {
-  title: string // torrent title
-  link: string // link to .torrent file, or magnet link
+  title: string
+  link: string
   id?: number
   seeders: number
   leechers: number
   downloads: number
   accuracy: Accuracy
-  hash: string // info hash
-  size: number // size in bytes
-  date: Date // date the torrent was uploaded
+  hash: string
+  size: number
+  date: Date
   type?: 'batch' | 'best' | 'alt'
 }
 
 export interface AnimeQuery {
-  media: any // anilist Media object
-  anilistId: number // anilist anime id
-  anidbAid?: number // anidb anime id
-  anidbEid?: number // anidb episode id
-  tvdbId?: number // thetvdb anime id
-  tvdbEId?: number // thetvdb episode id
-  imdbId?: string // imdb id
-  tmdbId?: string // tmdb anime id
-  titles: string[] // list of titles and alternative titles
+  media: any
+  anilistId: number
+  anidbAid?: number
+  anidbEid?: number
+  tvdbId?: number
+  tvdbEId?: number
+  imdbId?: string
+  tmdbId?: string
+  titles: string[]
   episode: number
-  episodeCount?: number // total episode count for the series
+  episodeCount?: number
   absoluteEpisodeNumber?: number
   resolution: '2160' | '1080' | '720' | '540' | '480' | ''
-  exclusions: string[] // list of keywords to exclude from searches, this might be unsupported codecs (e.g., "x265"), sources (e.g., "web-dl"), or other keywords (e.g., "uncensored")
+  exclusions: string[]
 }
 
 export type AnimeQueryWithFetch = AnimeQuery & { fetch: typeof fetch }
@@ -89,4 +121,45 @@ export class NZBSource {
 export class SubtitleSource {
   test: () => Promise<boolean>
   single: (query: Omit<AnimeQueryWithFetch, 'resolution' | 'exclusions'>, options?: SearchOptions) => Promise<Array<{url: string, language: string}>>
+}
+
+export interface ReaderQuery {
+  media: any
+  anilistId: number
+  malId?: number
+  titles: string[]
+  chapter?: number
+  language: string
+  fetch: typeof fetch
+}
+
+export interface ChapterInfo {
+  chapter: number
+  title?: string
+}
+
+export interface MangaChapterResult {
+  chapter: number
+  title?: string
+  language: string
+  pages: string[]
+}
+
+export interface NovelChapterResult {
+  chapter: number
+  title?: string
+  language: string
+  html: string
+}
+
+export class MangaSource {
+  test: () => Promise<boolean>
+  chapters: (query: Omit<ReaderQuery, 'chapter'>, options?: SearchOptions) => Promise<ChapterInfo[]>
+  chapter: (query: ReaderQuery, options?: SearchOptions) => Promise<MangaChapterResult>
+}
+
+export class NovelSource {
+  test: () => Promise<boolean>
+  chapters: (query: Omit<ReaderQuery, 'chapter'>, options?: SearchOptions) => Promise<ChapterInfo[]>
+  chapter: (query: ReaderQuery, options?: SearchOptions) => Promise<NovelChapterResult>
 }
