@@ -192,19 +192,19 @@ export class ExtensionWorker {
     return sanitizeResults(await state.mod.movie(proxy, options), computeAccuracy(accessed))
   }
 
-  async chapters (query: Omit<ReaderQuery, 'chapter'>, options?: SearchOptions): Promise<ChapterInfo[]> {
+  async chapters (query: Omit<ReaderQuery, 'chapter' | 'fetch'>, options?: SearchOptions): Promise<ChapterInfo[]> {
     const state = this._state!
     if (state.type !== 'manga' && state.type !== 'novel') throw new Error('chapters not supported for this source type')
-    const result = await state.mod.chapters({ ...query, fetch: _fetch }, options)
+    const result = await state.mod.chapters({ ...query, fetch: _fetch } as Omit<ReaderQuery, 'chapter'>, options)
     if (!Array.isArray(result)) return []
     return result.filter(c => c && typeof c.chapter === 'number')
   }
 
-  async chapter (query: ReaderQuery, options?: SearchOptions): Promise<MangaChapterResult | NovelChapterResult> {
+  async chapter (query: Omit<ReaderQuery, 'fetch'>, options?: SearchOptions): Promise<MangaChapterResult | NovelChapterResult> {
     const state = this._state!
     if (state.type !== 'manga' && state.type !== 'novel') throw new Error('chapter not supported for this source type')
     // ponytail: no accuracy proxy for manga/novel — pass query directly
-    return await state.mod.chapter({ ...query, fetch: _fetch }, options)
+    return await state.mod.chapter({ ...query, fetch: _fetch } as ReaderQuery, options)
   }
 
   async test () {

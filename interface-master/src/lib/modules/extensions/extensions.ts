@@ -9,7 +9,7 @@ import { settings, type videoResolutions } from '../settings'
 
 import { storage } from './storage'
 
-import type { TorrentResult } from './types'
+import type { TorrentResult, ReaderQuery } from './types'
 import type { EpisodesResponse, Titles, Episode } from '../anizip/types'
 import type { AnitomyResult } from 'anitomyscript'
 
@@ -392,6 +392,73 @@ export const extensions = new class Extensions {
     if (!parentID) return
 
     return await _episodes(parentID)
+  }
+
+  _getReaderQuery (media: Media, chapter: number | undefined, language: string): Omit<ReaderQuery, 'fetch'> {
+    return {
+      media,
+      anilistId: media.id,
+      malId: media.idMal ?? undefined,
+      titles: this.createTitles(media),
+      chapter,
+      language,
+    }
+  }
+
+  async * readerSources ({ media, type }: { media: Media, type: 'manga' | 'novel' }): AsyncGenerator<{ id: string, name: string, readingDirection?: string }> {
+    await storage.ready
+    const extopts = get(extensionOptions)
+    const configs = get(savedConfigs)
+    for (const [id] of storage.codeManager.extensions.entries()) {
+      if (!extopts[id]?.enabled) continue
+      if (configs[id]?.type !== type) continue
+      const config = configs[id]!
+      yield { id, name: config.name, readingDirection: 'readingDirection' in config ? config.readingDirection : undefined }
+    }
+  }
+
+  async readerChapters ({ media, type, language }: { media: Media, type: 'manga' | 'novel', language: string }): Promise<Record<string, { chapters: Array<{ chapter: number, title?: string }>, error?: ExtensionError }>> {
+    debug(`Fetching chapters for ${media.id}:${media.title?.userPreferred} type=${type}`)
+    await storage.ready
+    const extensions = storage.codeManager.extensions
+    const extopts = get(extensionOptions)
+    const configs = get(savedConfigs)
+
+    const { chapter: _, ...query } = this._getReaderQuery(media, undefined, language)
+    const results: Record<string, { chapters: Array<{ chapter: number, title?: string }>, error?: ExtensionError }> = {}
+
+    const tasks: Array<Promise<void>> = []
+    for (const [id, worker] of extensions.entries()) {
+      if (!extopts[id]?.enabled || configs[id]?.type !== type) continue
+      const extOptions = extopts[id].options
+      tasks.push(
+        raceWithHandler(
+          worker.chapters(query, extOptions) as Promise<Array<{ chapter: number, title?: string }>>,
+          chapters => { results[id] = { chapters: chapters ?? [] } },
+          error => { results[id] = { chapters: [], error: new ExtensionError(error, id) } }
+        ).then(() => {})
+      )
+    }
+    await Promise.allSettled(tasks)
+    return results
+  }
+
+  async readerChapter ({ media, type, chapter, sourceId, language, options }: { media: Media, type: 'manga' | 'novel', chapter: number, sourceId: string, language: string, options?: Record<string, never> }): Promise<{ chapter: number, title?: string, language: string, pages?: string[], html?: string }> {
+    debug(`Fetching chapter ${chapter} from ${sourceId} for ${media.id}`)
+    await storage.ready
+    const worker = storage.codeManager.extensions.get(sourceId)
+    if (!worker) throw new Error(`Source ${sourceId} not found`)
+    const configs = get(savedConfigs)
+    if (configs[sourceId]?.type !== type) throw new Error(`Source ${sourceId} is not a ${type} source`)
+
+    const query = this._getReaderQuery(media, chapter, language)
+    const extOptions = get(extensionOptions)[sourceId]?.options
+    const result = await raceTimeout(
+      worker.chapter(query, extOptions ?? options) as Promise<{ chapter: number, title?: string, language: string, pages?: string[], html?: string }>,
+      15_000
+    )
+    if (!result) throw new Error(`Timed out fetching chapter ${chapter} from ${sourceId}`)
+    return result
   }
 
   dedupe <T extends TorrentResult & { extension: Set<string> }> (entries: T[]): T[] {
