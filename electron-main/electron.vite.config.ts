@@ -79,6 +79,8 @@ const compileNativeModulesPlugin = ({ dependencies: NATIVE_PACKAGES }: { depende
           /require\s*\(\s*(['"`])((?:\.\.?\/).*?\.node)\1\s*\)/g,
           (_match, _quote, filePath) => {
             const absolutePath = resolve(dirname(id), filePath)
+            // Skip platform-specific .node files that do not exist on this OS
+            if (!existsSync(absolutePath)) return `require('${filePath.replace(/\\/g, '\\\\')}')`
             const assetName = `${pkgName(matchedPkg)}-${basename(absolutePath)}`
             const dstRel = `native-assets/${assetCounter++}-${assetName}`
             const dst = resolve(outDir, dstRel)

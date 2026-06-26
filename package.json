@@ -1,6 +1,6 @@
 {
   "name": "hayase-lite",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "description": "Hayase-lite - Personal torrent streaming app",
   "packageManager": "pnpm@10.28.1",
