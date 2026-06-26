@@ -235,10 +235,10 @@
 
   // ponytail: media-type filter — Anime / Manga / All. Maps to AniList $type variable.
   let mediaType: 'ANIME' | 'MANGA' | undefined = 'ANIME'
-  const mediaTypeOptions = [
-    { v: 'ANIME' as const, label: 'Anime' },
-    { v: 'MANGA' as const, label: 'Manga' },
-    { v: undefined as const, label: 'All' }
+  const mediaTypeOptions: Array<{ v: 'ANIME' | 'MANGA' | undefined, label: string }> = [
+    { v: 'ANIME', label: 'Anime' },
+    { v: 'MANGA', label: 'Manga' },
+    { v: undefined, label: 'All' }
   ]
 </script>
 

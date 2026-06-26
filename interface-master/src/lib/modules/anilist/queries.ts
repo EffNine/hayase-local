@@ -65,6 +65,7 @@ export const MediaEdgeFrag = gql(`
 
 export const FullMedia = gql(`
   fragment FullMedia on Media @_unmask {
+type,
 id,
 idMal,
 title {

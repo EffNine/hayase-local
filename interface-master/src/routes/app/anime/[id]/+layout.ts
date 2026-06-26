@@ -10,7 +10,7 @@ import { episodes } from '$lib/modules/anizip'
 
 export const load: LayoutLoad = async ({ params, fetch }) => {
   const id = Number(params.id)
-  const store = asyncStore(IDMedia, { id }, { requestPolicy: 'cache-first' })
+  const store = asyncStore(IDMedia, { id, type: 'ANIME' }, { requestPolicy: 'cache-first' })
 
   const info = client.animePage(id)
   let eps = await episodes(id, fetch)

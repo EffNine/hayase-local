@@ -23,7 +23,12 @@
   let hidden = true
 
   function onclick () {
-    goto(`/#/app/anime/${media.id}`)
+    // ponytail: route manga/novel to reader, anime to detail page
+    if (media.type === 'MANGA') {
+      goto(`/#/app/reader/${media.id}`)
+    } else {
+      goto(`/#/app/anime/${media.id}`)
+    }
   }
   function onhover (state: boolean) {
     hidden = !state
