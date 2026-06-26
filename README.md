@@ -28,4 +28,6 @@ Downloads are published to [GitHub Releases](https://github.com/afnanrudy/hayase
 
 ## License
 
-MIT
+Business Source License 1.1 (BUSL-1.1). See [LICENSE](./LICENSE).
+
+This project is a derivative of [Miru](https://github.com/ThaUnknown/miru) and inherits its BUSL-1.1 terms. On the Change Date (2029-04-01), use of this software will be governed by GPL-3.0.
