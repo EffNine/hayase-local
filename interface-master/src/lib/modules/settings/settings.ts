@@ -16,6 +16,9 @@ const _debug = Debug('ui:settings')
 
 export const settings = persisted('settings', defaults, { beforeRead: value => ({ ...defaults, ...value }) })
 
+// ponytail: persisted manga reader mode — null = no explicit choice, fall back to readingDirection
+export const readerMode = persisted<'page' | 'vertical' | null>('reader-mode', null)
+
 export const debug = persisted('debug-key', '')
 
 const alID = SUPPORTS.isIOS ? '39545' : dev ? '26159' : '3461'

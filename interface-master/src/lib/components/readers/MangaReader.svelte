@@ -1,12 +1,21 @@
 <script lang='ts'>
+  import { get } from 'svelte/store'
+  import { readerMode } from '$lib/modules/settings/settings'
+
   export let pages: string[]
   export let readingDirection: 'rtl' | 'ltr' | 'vertical' = 'rtl'
   export let onNextChapter: () => void
   export let onPrevChapter: () => void
 
-  let mode: 'page' | 'vertical' = readingDirection === 'vertical' ? 'vertical' : 'page'
+  // ponytail: mode persists across chapters/sessions until the user toggles it; null falls back to direction
+  let mode: 'page' | 'vertical' = get(readerMode) ?? (readingDirection === 'vertical' ? 'vertical' : 'page')
   let currentPage = 0
   let container: HTMLElement
+
+  function toggleMode () {
+    mode = mode === 'page' ? 'vertical' : 'page'
+    readerMode.set(mode)
+  }
 
   $: displayPages = readingDirection === 'rtl' && mode === 'page' ? [...pages].reverse() : pages
 
@@ -44,7 +53,7 @@
 <div class='flex flex-col h-full'>
   <!-- Reader controls -->
   <div class='flex items-center gap-2 px-4 py-2 bg-muted border-b border-border shrink-0'>
-    <button class='text-xs px-2 py-1 rounded hover:bg-accent' on:click={() => { mode = mode === 'page' ? 'vertical' : 'page' }}>
+    <button class='text-xs px-2 py-1 rounded hover:bg-accent' on:click={toggleMode}>
       {mode === 'page' ? 'Scroll' : 'Pages'}
     </button>
     <div class='flex-1' />
