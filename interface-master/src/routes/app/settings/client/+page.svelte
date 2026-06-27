@@ -9,7 +9,7 @@
   import native from '$lib/modules/native'
   import { settings, SUPPORTS } from '$lib/modules/settings'
 
-  async function selectDownloadFolder (type: string | undefined) {
+  async function selectDownloadFolder (type?: string) {
     try {
       $settings.torrentPath = await native.selectDownload(type as 'cache' | 'internal' | 'sdcard' | undefined)
     } catch (error) {

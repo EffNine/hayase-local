@@ -14,7 +14,7 @@
   import { SUPPORTS, settings } from '$lib/modules/settings'
   import { fastPrettyBytes } from '$lib/utils'
 
-  async function selectDownloadFolder (type: string | undefined) {
+  async function selectDownloadFolder (type?: string) {
     try {
       $settings.torrentPath = await native.selectDownload(type as 'cache' | 'internal' | 'sdcard' | undefined)
     } catch (error) {
