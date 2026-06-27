@@ -1,0 +1,5 @@
+# Novels are a distinct extension type, keyed off AniList `format`
+
+AniList types light novels as `type: MANGA` with `format: NOVEL`. Rather than treat novels as a manga subtype with format-aware rendering, we give them a separate extension type (`novel`), source contract (`NovelSource` / `NovelChapterResult` returning sanitized HTML), and reader (`NovelReader`). The split is keyed off `media.format === 'NOVEL'` — never `media.type`, which cannot distinguish novels from manga — via a single `readerType` discriminator used in the detail page, reader, and library.
+
+This keeps the image-reader and text-reader contracts cleanly separated (a manga source returns `pages: string[]`; a novel source returns `html: string`) at the cost of a second source type that authors must opt into. The rejected alternative — one `manga` type with a format-aware reader switching on `NOVEL` — would have coupled two unrelated rendering models and made the source contract's result type a union.
