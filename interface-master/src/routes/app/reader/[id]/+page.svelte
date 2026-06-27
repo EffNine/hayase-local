@@ -11,13 +11,13 @@
   import { authAggregator as auth } from '$lib/modules/auth'
   import { getCachedChapter, setCachedChapter } from '$lib/modules/cache'
   import { extensions } from '$lib/modules/extensions/extensions'
+  import { readerType as getReaderType } from '$lib/modules/anilist'
 
   export let data: PageData
 
   $: media = data.media
 
-  // ponytail: AniList types novels as MANGA format=NOVEL
-  $: readerType = media.format === 'NOVEL' ? 'novel' : 'manga'
+  $: readerType = getReaderType(media)
 
   let selectedSourceId: string | null = null
   let chapters: Array<{ chapter: number, title?: string }> = []
@@ -104,8 +104,8 @@
     if (next) {
       await openChapter(next.chapter)
     } else {
-      await syncProgress(currentChapter)
-      goto(`/#/app/anime/${media.id}`)
+      await syncProgress(currentChapter, 'COMPLETED')
+      goto(`/#/app/media/${media.id}`)
     }
   }
 
@@ -117,13 +117,13 @@
 
   async function onCloseReader () {
     if (currentChapter != null) await syncProgress(currentChapter)
-    goto(`/#/app/anime/${media.id}`)
+    goto(`/#/app/media/${media.id}`)
   }
 
   // ponytail: progress sync via auth module — same Entry mutation as anime episode tracking
-  async function syncProgress (chapter: number) {
+  async function syncProgress (chapter: number, status: 'CURRENT' | 'COMPLETED' = 'CURRENT') {
     try {
-      await auth.entry({ id: media.id, progress: chapter, status: 'CURRENT' })
+      await auth.entry({ id: media.id, progress: Math.floor(chapter), status })
     } catch {
     // silent fail — progress sync is best-effort
     }

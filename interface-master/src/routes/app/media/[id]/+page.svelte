@@ -11,6 +11,7 @@
   import * as Tabs from '$lib/components/ui/tabs'
   import { Themes } from '$lib/components/ui/themes'
   import type { Media } from '$lib/modules/anilist/types'
+  import { readerType } from '$lib/modules/anilist'
   import { extensions } from '$lib/modules/extensions/extensions'
   import '@xyflow/svelte/dist/style.css'
   import { dragScroll } from '$lib/modules/navigate'
@@ -39,7 +40,7 @@
 
   async function loadSources () {
     availableSources = []
-    for await (const src of extensions.readerSources({ media, type: 'manga' })) {
+    for await (const src of extensions.readerSources({ media, type: readerType(media) })) {
       availableSources = [...availableSources, src]
     }
     if (!selectedSourceId && availableSources.length) {
@@ -53,7 +54,7 @@
     loadingChapters = true
     chapters = []
     try {
-      const results = await extensions.readerChapters({ media, type: 'manga', language: 'en' })
+      const results = await extensions.readerChapters({ media, type: readerType(media), language: 'en' })
       const sourceResult = results[selectedSourceId]
       if (sourceResult?.error) {
         toast.error(`Error from ${availableSources.find(s => s.id === selectedSourceId)?.name}`, { description: sourceResult.error.error.message })

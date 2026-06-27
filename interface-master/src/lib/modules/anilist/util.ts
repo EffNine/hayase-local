@@ -31,6 +31,11 @@ export function coverSmall (media: Pick<Media, 'trailer' | 'bannerImage' | 'cove
   return media.coverImage?.medium ?? banner(media)
 }
 
+// ponytail: novels share AniList type MANGA — discriminate by format, never type (CONTEXT.md → Reader type)
+export function readerType (media: Pick<Media, 'format'>): 'manga' | 'novel' {
+  return media.format === 'NOVEL' ? 'novel' : 'manga'
+}
+
 let titleType = 'ANILIST' as 'ANILIST' | 'ROMAJI' | 'ENGLISH' | 'NATIVE'
 
 settings.subscribe(s => {
