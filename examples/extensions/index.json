@@ -11,8 +11,8 @@
     "languages": ["ALL"],
     "description": "Reference example — returns placeholder torrents. Not a real source.",
     "icon": "https://placehold.co/64x64/png",
-    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
-    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-torrent.js"
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/dummy-torrent.js"
   },
   {
     "manifestVersion": 2,
@@ -26,8 +26,8 @@
     "languages": ["ALL"],
     "description": "Reference example — returns placeholder NZBs. Not a real source.",
     "icon": "https://placehold.co/64x64/png",
-    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
-    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-nzb.js"
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/dummy-nzb.js"
   },
   {
     "manifestVersion": 2,
@@ -39,8 +39,8 @@
     "languages": ["ALL"],
     "description": "Reference example — returns placeholder subtitles. Not a real source.",
     "icon": "https://placehold.co/64x64/png",
-    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
-    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-subtitle.js"
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/dummy-subtitle.js"
   },
   {
     "manifestVersion": 2,
@@ -53,8 +53,8 @@
     "readingDirection": "rtl",
     "description": "Reference example — returns placeholder manga pages. Not a real source.",
     "icon": "https://placehold.co/64x64/png",
-    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
-    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-manga.js"
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/dummy-manga.js"
   },
   {
     "manifestVersion": 2,
@@ -66,7 +66,7 @@
     "languages": ["ALL"],
     "description": "Reference example — returns placeholder novel text. Not a real source.",
     "icon": "https://placehold.co/64x64/png",
-    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/index.json",
-    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-local/main/examples/extensions/dummy-novel.js"
+    "update": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/index.json",
+    "code": "https://raw.githubusercontent.com/afnanrudy/hayase-lite/main/examples/extensions/dummy-novel.js"
   }
 ]
