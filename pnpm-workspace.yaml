@@ -8,6 +8,7 @@ onlyBuiltDependencies:
   - '@paymoapp/electron-shutdown-handler'
   - '@thaunknown/yencode'
   - bufferutil
+  - electron
   - electron-winstaller
   - esbuild
   - ip-set

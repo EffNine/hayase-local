@@ -14,9 +14,9 @@
   import { SUPPORTS, settings } from '$lib/modules/settings'
   import { fastPrettyBytes } from '$lib/utils'
 
-  async function selectDownloadFolder (type?: string) {
+  async function selectDownloadFolder (type: 'cache' | 'internal' | 'sdcard' | undefined = undefined) {
     try {
-      $settings.torrentPath = await native.selectDownload(type as 'cache' | 'internal' | 'sdcard' | undefined)
+      $settings.torrentPath = await native.selectDownload(type)
     } catch (error) {
       toast.error('Failed to select download folder. Please try again.', {
         description: (error instanceof Error ? error.message : error as string),
