@@ -99,8 +99,8 @@ extraResources:
     to: ui
 publish:
   provider: github
-  owner: afnanrudy
-  repo: hayase-lite
+  owner: EffNine
+  repo: hayase-local
 protocols:
   - name: hayase-lite
     schemes:

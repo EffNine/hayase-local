@@ -24,7 +24,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-Downloads are published to [GitHub Releases](https://github.com/afnanrudy/hayase-lite/releases).
+Downloads are published to [GitHub Releases](https://github.com/EffNine/hayase-local/releases).
 
 ### macOS install
 
