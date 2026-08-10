@@ -13,18 +13,6 @@ const pkgName = (pkg: string) => pkg.replace(/@/g, '').replace(/\//g, '-')
 
 const nativeModuleDir = (pkg: string) => `native-modules/${pkgName(pkg)}`
 
-const externalMainDependencies = [
-  /^@silentbot1\//,
-  /^@thaunknown\//,
-  /^debug$/,
-  /^electron$/,
-  /^fast-xml-parser$/,
-  /^multicast-dns$/,
-  /^native$/,
-  /^network-address$/,
-  /^protobufjs/
-]
-
 function copyDirRecursive (src: string, dst: string, fileFilter?: (name: string) => boolean) {
   if (!existsSync(dst)) mkdirSync(dst, { recursive: true })
   for (const entry of readdirSync(src, { withFileTypes: true })) {
@@ -167,8 +155,6 @@ const electronUnzipPlugin = () => {
   return {
     name: 'electron-unzip',
     buildStart () {
-      // skip on dev
-      // if (process.env.NODE_ENV === 'development') return
       const electronDistPath = resolve(__dirname, 'electron-dist')
 
       let zipPattern: string
@@ -231,9 +217,6 @@ export default defineConfig({
       commonjsOptions: {
         ignore: (id: string) => id.endsWith('.node'),
         ignoreDynamicRequires: true
-      },
-      rollupOptions: {
-        external: externalMainDependencies
       }
     },
     plugins: [
@@ -269,7 +252,6 @@ export default defineConfig({
     }
   },
   preload: {
-    // preload is too small for bytecodePlugin to be effective
     plugins: [
       license({
         thirdParty: {

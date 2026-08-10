@@ -1,4 +1,5 @@
-import { app } from 'electron'
+import { app, BrowserWindow } from 'electron'
+import { optimizer } from '@electron-toolkit/utils'
 
 import App from './app.ts'
 
@@ -20,5 +21,7 @@ if (!app.requestSingleInstanceLock()) {
     if (main == null) createWindow()
   })
 
-  // ponytail: removed optimizer.watchWindowShortcuts, add back if window shortcut customization is needed
+  app.on('browser-window-created', (_, window) => {
+    optimizer.watchWindowShortcuts(window)
+  })
 }

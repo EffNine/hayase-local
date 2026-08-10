@@ -3,7 +3,7 @@ import process from 'node:process'
 
 import electronShutdownHandler from '@paymoapp/electron-shutdown-handler'
 import { expose } from 'abslink/electron'
-import { BrowserWindow, MessageChannelMain, app, dialog, ipcMain, powerMonitor, utilityProcess, Tray, Menu, protocol, net, nativeImage, session, nativeTheme, webFrame } from 'electron' // type NativeImage, Notification, nativeImage,
+import { BrowserWindow, MessageChannelMain, app, dialog, ipcMain, powerMonitor, utilityProcess, Tray, Menu, protocol, net, nativeImage, session, nativeTheme, webFrame } from 'electron'
 import log from 'electron-log/main'
 import { autoUpdater } from 'electron-updater'
 
@@ -13,8 +13,9 @@ import icon from '../../build/icon.png?asset'
 import './util.ts'
 import { rewriteInternalRequest } from './al.ts'
 import forkPath from './background/background.ts?modulePath'
-// import Protocol from './protocol.ts'
+import Discord from './discord.ts'
 import IPC from './ipc.ts'
+import Plugins from './plugins.ts'
 import Protocol from './protocol.ts'
 import store from './store.ts'
 import Updater from './updater.ts'
@@ -34,8 +35,6 @@ log.hooks.push(message => {
 })
 
 autoUpdater.logger = log
-
-// const TRANSPARENCY = store.get('transparency')
 
 const BASE_URL = !app.isPackaged ? 'http://localhost:7344/' : 'app://ui/'
 
@@ -62,10 +61,9 @@ export default class App {
   mainWindow = new BrowserWindow({
     width: 1600,
     height: 869,
-    frame: false, // process.platform === 'darwin', // Only keep the native frame on Mac
+    frame: false,
     titleBarStyle: 'hidden',
     autoHideMenuBar: true,
-    // transparent: TRANSPARENCY,
     resizable: true,
     maximizable: true,
     fullscreenable: true,
@@ -84,6 +82,8 @@ export default class App {
   })
 
   protocol = new Protocol(this.mainWindow)
+  discord = new Discord()
+  plugins = new Plugins(this.mainWindow)
   updater = new Updater()
   ipc = new IPC(this, this.torrentProcess)
   tray = new Tray(process.platform === 'win32' ? ico : process.platform === 'darwin' ? nativeImage.createFromPath(icon).resize({ width: 16, height: 16 }) : icon)
@@ -146,35 +146,6 @@ export default class App {
     })
     this.torrentProcess.stderr?.on('data', d => log.error('' + d))
     this.torrentProcess.stdout?.on('data', d => log.log('' + d))
-    // if (TRANSPARENCY) {
-    // // Transparency fixes, window is resizable when fullscreen/maximized
-    //   this.mainWindow.on('enter-html-full-screen', () => {
-    //     this.mainWindow.setResizable(false)
-    //   })
-    //   this.mainWindow.on('leave-html-full-screen', () => {
-    //     this.mainWindow.setResizable(!this.mainWindow.isMaximized())
-    //   })
-    //   this.mainWindow.on('enter-full-screen', () => {
-    //     this.mainWindow.setResizable(false)
-    //   })
-    //   this.mainWindow.on('leave-full-screen', () => {
-    //     this.mainWindow.setResizable(!this.mainWindow.isMaximized())
-    //   })
-    //   this.mainWindow.on('maximize', () => {
-    //     this.mainWindow.setResizable(false)
-    //   })
-    //   this.mainWindow.on('unmaximize', () => {
-    //     this.mainWindow.setResizable(true)
-    //   })
-
-    //   this.mainWindow.on('will-move', (e) => {
-    //     if (this.mainWindow.isMaximized()) {
-    //       this.mainWindow.setResizable(true)
-    //       this.mainWindow.unmaximize()
-    //       e.preventDefault()
-    //     }
-    //   })
-    // }
 
     if (this.unsafeUseInternalALAPI) {
       session.defaultSession.webRequest.onBeforeRequest({ urls: ['https://graphql.anilist.co/*'] }, (details, callback) => {
@@ -195,8 +166,6 @@ export default class App {
       callback({ cancel: false, requestHeaders: details.requestHeaders })
     })
 
-    // anilist.... forgot to set the cache header on their preflights..... pathetic.... this just wastes rate limits, this fixes it!
-    // they also don't set CORS headers on errors
     session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
       if (details.url.startsWith('https://graphql.anilist.co') && details.responseHeaders) {
         setCors(details.responseHeaders)
@@ -224,7 +193,6 @@ export default class App {
     })
 
     this.tray.setToolTip('Hayase-lite')
-    // this needs to be way better lol
     this.tray.setContextMenu(Menu.buildFromTemplate([
       { label: 'Hayase-lite', enabled: false },
       { type: 'separator' },
@@ -275,26 +243,8 @@ export default class App {
       this.destroy()
     })
 
-    // TODO
-    // ipcMain.on('notification', async (_e, opts: { icon?: string | NativeImage, data: { id?: number }}) => {
-    //   if (opts.icon != null) {
-    //     const res = await fetch(opts.icon as string)
-    //     const buffer = await res.arrayBuffer()
-    //     opts.icon = nativeImage.createFromBuffer(Buffer.from(buffer))
-    //   }
-    //   const notification = new Notification(opts)
-    //   notification.on('click', () => {
-    //     if (opts.data.id != null) {
-    //       this.mainWindow.show()
-    //       this.protocol.protocolMap.anime(',' + opts.data.id)
-    //     }
-    //   })
-    //   notification.show()
-    // })
-
     app.setAppUserModelId('com.github.afnanrudy.hayase-lite')
     if (process.platform === 'win32') {
-      // this message usually fires in dev-mode from the parent process
       process.on('message', data => {
         if (data === 'graceful-exit') this.destroy()
       })
@@ -323,13 +273,30 @@ export default class App {
       }
     })
 
+    // Navigation history: back/forward with swipe gestures
+    this.mainWindow.on('app-command', (_e, command) => {
+      if (command === 'browser-backward') {
+        this.protocol.navigateTarget()
+      }
+    })
+
+    let lastSwipe = 0
+    this.mainWindow.webContents.on('input-event', (_e, input) => {
+      if (input.type === 'gestureSwipe' && input.x !== 0) {
+        const now = Date.now()
+        if (now - lastSwipe < 100) return
+        lastSwipe = now
+        if (input.x > 0) {
+          this.protocol.navigateTarget()
+        }
+      }
+    })
+
     let crashcount = 0
     this.mainWindow.webContents.on('render-process-gone', async (_e, { reason }) => {
       if (reason === 'crashed') {
         if (++crashcount > 10) {
-          // TODO
           await dialog.showMessageBox({ message: 'Crashed too many times.', title: 'Hayase-lite', detail: 'App crashed too many times. Please restart the app.', icon })
-          // Crash recovery URL removed in Hayase-lite
         } else {
           app.relaunch()
         }
@@ -354,13 +321,10 @@ export default class App {
 
     app.on('second-instance', (_event, commandLine) => {
       if (this.destroyed) return
-      // Someone tried to run a second instance, we should focus our window.
       this.mainWindow.show()
       this.mainWindow.focus()
       if (this.mainWindow.isMinimized()) this.mainWindow.restore()
       this.mainWindow.focus()
-      // There's probably a better way to do this instead of a for loop and split[1][0]
-      // but for now it works as a way to fix multiple OS's commandLine differences
       for (const line of commandLine) {
         this.protocol.handleProtocol(line)
       }

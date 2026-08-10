@@ -80,6 +80,7 @@ const native: Partial<Native> = {
   updateSettings: (settings) => main.updateSettings(settings),
   cachedTorrents: async () => await (await torrent).cached(),
   createNZB: async (id, url) => await (await torrent).createNZBWebSeed(id, url),
+  createHTTPWebSeed: async (id, url, authorization, fileIndex, rateLimit) => await (await torrent).createHTTPWebSeed(id, url, authorization, fileIndex, rateLimit),
   getDisplays: async cb => await (await torrent).listenDisplay(proxy(cb)),
   castPlay: async (host, hash, id, media) => await (await torrent).playDisplay(host, hash, id, media),
   castClose: async (host) => await (await torrent).closeDisplay(host),
@@ -105,7 +106,11 @@ const native: Partial<Native> = {
   },
   defaultTransparency: () => false,
   debug: async (levels) => await (await torrent).debug(levels),
-  accentColor: () => main.accentColor()
+  accentColor: () => main.accentColor(),
+  pluginList: () => main.pluginList(),
+  pluginPopup: (pluginId: string) => main.pluginPopup(pluginId),
+  pluginImport: (id?: string) => main.pluginImport(id),
+  pluginDelete: (id: string) => main.pluginDelete(id)
 }
 
 try {

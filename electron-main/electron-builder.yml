@@ -1,6 +1,17 @@
 appId: com.github.afnanrudy.hayase-lite
 productName: Hayase-lite
 electronVersion: 42.2.0
+electronFuses:
+  resetAdHocDarwinSignature: false
+  runAsNode: false
+  enableCookieEncryption: true
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  disallowCodeGenerationFromStrings: true
+  disableProtoThrow: true
+  frozenIntrinsics: true
 directories:
   buildResources: build
 asarUnpack:
@@ -34,7 +45,6 @@ win:
     - target: nsis
       arch:
         - x64
-  # signAndEditExecutable: true
   verifyUpdateCodeSignature: false
   artifactName: ${os}-${name}-${version}-installer.${ext}
 nsis:
@@ -61,7 +71,7 @@ mac:
     - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-  notarize: false
+  notarize: true
   target:
     - target: default
       arch:
@@ -73,12 +83,6 @@ linux:
     - target: deb
       arch:
         - x64
-    # - target: pacman
-    #   arch:
-    #     - x64
-    # - target: rpm
-    #   arch:
-    #     - x64
     - target: AppImage
       arch:
         - x64
@@ -101,6 +105,7 @@ publish:
   provider: github
   owner: EffNine
   repo: hayase-local
+electronDist: electron-dist
 protocols:
   - name: hayase-lite
     schemes:

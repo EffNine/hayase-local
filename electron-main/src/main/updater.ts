@@ -1,16 +1,20 @@
-// Auto-updater disabled for Hayase-lite (personal use)
-// To re-enable, set a feed URL and uncomment the check below:
-// autoUpdater.setFeedURL({ url: 'https://your-update-server/files', provider: 'generic' })
-// autoUpdater.checkForUpdates()
+import { autoUpdater } from 'electron-updater'
+
+autoUpdater.setFeedURL({ url: 'https://api.hayase.watch/files', provider: 'generic' })
 
 export default class Updater {
   hasUpdate = false
 
   constructor () {
-    // Auto-update disabled
+    autoUpdater.checkForUpdates()
+    setInterval(() => {
+      autoUpdater.checkForUpdates()
+    }, 30 * 60 * 1000).unref()
   }
 
-  install (_forceRunAfter = false) {
-    return false
+  install (forceRunAfter = false) {
+    if (!this.hasUpdate) return false
+    autoUpdater.quitAndInstall(false, forceRunAfter)
+    return true
   }
 }

@@ -129,6 +129,14 @@ export interface SubtitleTrack {
   header?: string
 }
 
+export interface PluginInfo {
+  id: string
+  name: string
+  version: string
+  description: string
+  permissions: string[]
+}
+
 export interface Native {
   authAL: (url: string) => Promise<AuthResponse>
   authMAL: (url: string) => Promise<{ code: string, state: string }>
@@ -185,6 +193,7 @@ export interface Native {
   updateToNewEndpoint: (endpoint: string) => Promise<void>
   cachedTorrents: () => Promise<string[]>
   createNZB: (hash: string, url: string) => Promise<void>
+  createHTTPWebSeed: (id: string, url: string, authorization?: string, fileIndex?: number, rateLimit?: number) => Promise<void>
   getDisplays: (cb: (displays: Array<{ friendlyName: string, host: string }>) => void) => Promise<void>
   castPlay: (host: string, hash: string, id: number, media: MediaInformation) => Promise<void>
   castClose: (host: string) => Promise<void>
@@ -203,4 +212,8 @@ export interface Native {
   debug: (levels: string) => Promise<void>
   profile: (seconds: number) => Promise<void>
   accentColor: () => Promise<string>
+  pluginList: () => Promise<PluginInfo[]>
+  pluginPopup: (pluginId: string) => Promise<void>
+  pluginImport: (id?: string) => Promise<PluginInfo>
+  pluginDelete: (id: string) => Promise<void>
 }

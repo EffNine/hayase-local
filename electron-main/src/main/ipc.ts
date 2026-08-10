@@ -151,26 +151,30 @@ export default class IPC {
     this.app.mainWindow.webContents.openDevTools({ mode: 'detach' })
   }
 
-  toggleDiscordDetails (_enabled: boolean) {
-    // Discord RPC removed in Hayase-lite
+  toggleDiscordDetails (enabled: boolean) {
+    this.app.discord.allowDiscordDetails = enabled
   }
 
-  setMediaSession (_metadata: any, _id: number) {
-    // Discord RPC removed in Hayase-lite
+  setMediaSession (metadata: any, mediaId: number, duration: number) {
+    this.app.discord.session = metadata
+    this.app.discord.mediaId = mediaId
+    this.app.discord.position = { duration, playbackRate: 1, position: 0 }
+    this.app.discord.debouncedDiscordRPC()
   }
 
-  setPositionState (_state?: any) {
-    // Discord RPC removed in Hayase-lite
+  setPositionState (state?: any) {
+    this.app.discord.position = state
+    this.app.discord.debouncedDiscordRPC()
   }
 
-  setPlayBackState (_paused: 'none' | 'paused' | 'playing') {
-    // Discord RPC removed in Hayase-lite
+  setPlayBackState (paused: 'none' | 'paused' | 'playing') {
+    this.app.discord.playback = paused
+    this.app.discord.debouncedDiscordRPC()
   }
 
   setDOH (dns: string) {
     this.app.setDOH(dns)
     store.set('doh', dns)
-    // this.updateSettings()
   }
 
   version () {
@@ -224,6 +228,21 @@ export default class IPC {
       playerProcess.once('close', resolve)
       playerProcess.once('error', reject)
     })
-    // this.dispatch('open', `intent://localhost:${this.server.address().port}${found.streamURL}#Intent;type=video/any;scheme=http;end;`)
+  }
+
+  pluginList () {
+    return this.app.plugins.list()
+  }
+
+  pluginPopup (pluginId: string) {
+    return this.app.plugins.popup(pluginId)
+  }
+
+  pluginImport (id?: string) {
+    return this.app.plugins.import(id)
+  }
+
+  pluginDelete (id: string) {
+    return this.app.plugins.delete(id)
   }
 }

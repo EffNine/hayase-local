@@ -24,6 +24,7 @@ import { ChromeCasts } from './chromecast/index.ts'
 import { DLNAs } from './dlna/index.ts'
 import DoHResolver from './doh'
 import { NZBManager } from './nzb.ts'
+import { HTTPManager } from './http.ts'
 
 import type { PROVIDERS } from './doh'
 import type { MediaInformation } from 'chromecast-caf-receiver/cast.framework.messages'
@@ -117,6 +118,7 @@ const opts = Symbol('opts')
 const tmp = Symbol('tmp')
 const doh = Symbol('doh')
 const nzb = Symbol('nzb')
+const http = Symbol('http')
 const tracker = new HTTPTracker({}, atob('aHR0cDovL255YWEudHJhY2tlci53Zjo3Nzc3L2Fubm91bmNl'))
 
 class Store {
@@ -202,6 +204,7 @@ export default class TorrentClient {
   [tmp]: string
   [doh]?: DoHResolver
   [nzb]?: NZBManager
+  [http] = new HTTPManager()
 
   attachments = attachments
 
@@ -616,6 +619,12 @@ export default class TorrentClient {
     await this[nzb]?.addNZBPeers(torrent, url)
   }
 
+  async createHTTPWebSeed (id: string, url: string, authorization?: string, fileIndex?: number, rateLimit?: number) {
+    const torrent = await this[client].get(id)
+    if (!torrent) throw new Error('Torrent not found')
+    await this[http].addHTTPPeers(torrent, url, authorization, fileIndex, rateLimit)
+  }
+
   async torrentInfo (id: string) {
     const torrent = await this[client].get(id)
     if (!torrent) throw new Error('Torrent not found')
@@ -637,13 +646,17 @@ export default class TorrentClient {
       const parsed = peerid(wire.peerId!)
 
       const progress = this._wireProgress(wire, torrent)
+      const isWebSeed = wire.type === 'webSeed'
+      // @ts-expect-error bad typedefs
+      const ip = isWebSeed ? (wire.domain ?? wire.remoteAddress) : wire.remoteAddress.replace(/^::ffff:/, '') + ':' + wire.remotePort
+      // @ts-expect-error bad typedefs
+      const client = isWebSeed ? (wire.webSeedType ?? 'http') : `${parsed.client} ${parsed.version ?? ''}`
 
       return {
-        // @ts-expect-error bad typedefs
-        ip: wire.type === 'webSeed' ? wire.domain : wire.remoteAddress.replace(/^::ffff:/, '') + ':' + wire.remotePort,
+        ip,
         // @ts-expect-error bad typedefs
         seeder: wire.isSeeder,
-        client: wire.type === 'webSeed' ? 'nntp' : `${parsed.client} ${parsed.version ?? ''}`,
+        client,
         progress,
         size: {
           downloaded: wire.downloaded,
@@ -773,6 +786,7 @@ export default class TorrentClient {
       new Promise(resolve => this[client].destroy(resolve)),
       new Promise(resolve => tracker.destroy(resolve)),
       this[nzb]?.destroy(),
+      this[http].destroy(),
       this[doh]?.destroy()
     ])
     exit()
