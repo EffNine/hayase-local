@@ -30,7 +30,7 @@
 		"bittorrent-protocol": "^4.0.0",
 		"cross-fetch-ponyfill": "^1.0.3",
 		"debug": "^4.4.0",
-		"fast-xml-parser": "^5.9.0",
+		"fast-xml-parser": "^5.12.0",
 		"lt_donthave": "^2.0.0",
 		"matroska-metadata": "^1.0.12",
 		"multicast-dns": "^7.2.5",
